@@ -1,0 +1,34 @@
+nextflow.enable.dsl=2
+cleanup=false
+
+includeConfig "$baseDir/modules/config/params.config"
+
+singularity {
+  enabled = true
+  singularity.envWhitelist = ["SINGULARITY_TMPDIR"]
+  runOptions = '--bind /orfeo:/orfeo --bind $SINGULARITY_TMPDIR:/tmp'
+}
+
+process {
+   executor='slurm'
+   queue='THIN'
+   errorStrategy = 'finish'
+}
+
+process {
+  withName: 'MODKIT' {
+    time='12h'
+    container = ''
+    memory = '20 GB'
+    errorStrategy = 'finish'
+  }
+  
+  withName: 'CLAIRS' {
+    time='12h'
+    container = ''
+    memory = '20 GB'
+    errorStrategy = 'finish'
+  }
+
+
+}

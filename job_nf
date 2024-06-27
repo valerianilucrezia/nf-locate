@@ -1,0 +1,25 @@
+#!/bin/sh
+#### Cluster specific arguments ####
+
+#SBATCH --job-name=nf_lr_master
+#SBATCH --error=err
+#SBATCH --partition=THIN
+#SBATCH --nodes=1
+#SBATCH --ntasks=2
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10G
+#SBATCH --time=12:00:00
+#SBATCH -A lade
+#SBATCH --output=log
+
+module load singularity/3.10.4
+module load java/1.8.0
+
+lr_dna=/orfeo/LTS/LADE/LT_storage/lvaleriani/LR_Pipeline_DNA
+RESULTS_PATH=$lr_data/results/
+
+/orfeo/LTS/LADE/LT_storage/lvaleriani/nextflow/nextflow run $lr_dna/main.nf \
+    -resume \
+    -c $lr_dna/modules/config/config \
+    --samples $lr_dna/input.csv \
+    --publish_dir $RESULTS_PATH 
