@@ -1,0 +1,6 @@
+https://depot.galaxyproject.org/singularity/ont-modkit%3A0.3.1--h5c23e0d_1
+https://depot.galaxyproject.org/singularity/bcftools%3A1.9--ha228f0b_4
+https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8
+docker://hkubal/clairs:latest
+
+image for R
