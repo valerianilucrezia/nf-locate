@@ -1,6 +1,6 @@
 # LR_Pipeline_DNA
 
-![lr_pipeline](https://github.com/valerianilucrezia/LR_Pipeline_DNA/assets/72545549/d3d15afb-fb25-414a-9502-349d177d68cd)
+![lr_data](https://github.com/valerianilucrezia/LR_Pipeline_DNA/assets/72545549/d37b9fa1-46fc-4ba1-a793-20329223a100)
 
 N/T = Normal and Tumor **Separately**
 
