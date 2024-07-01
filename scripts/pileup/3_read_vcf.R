@@ -3,7 +3,7 @@ library(vcfR)
 
 for (ch in paste0('chr', seq(1,22))){
 	print(ch)
-	data <- paste0('/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/allelecount/vcf_cnv/normal/filter/vcf/filter_g100_', ch, '.vcf.gz')
+	data <- paste0('', ch, '.vcf.gz')
 
 	vcf <- read.vcfR(data)
 	vcf <- vcfR::vcfR2tidy(vcf)
@@ -17,10 +17,10 @@ for (ch in paste0('chr', seq(1,22))){
 	select(id, POS, gt_DP, gt_AD, gt_GT, gt_GT_alleles, -gt_GT_alleles) 
 
 	join <- inner_join(gt, fix, join_by(id)) %>%
-	tidyr::separate(col = gt_AD, into = c('Nref', 'Nalt'), convert = T) %>%
+	  tidyr::separate(col = gt_AD, into = c('Nref', 'Nalt'), convert = T) %>%
 	mutate(AF = Nalt/(Nalt + Nref)) %>%
 	mutate(AF = ifelse(is.na(AF),  0, AF))
 	
-	saveRDS(join, paste0('/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/allelecount/vcf_cnv/normal/filter/rds/filter_g100_', ch, '.rds'))
+	saveRDS(object = join, file = paste0('', ch, '.rds'))
 
 }

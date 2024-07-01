@@ -15,11 +15,10 @@ echo $ch
 
 module load bcftools
 
-#bed=/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/meth/bed_meth/chr${ch}_tumor_meth
-bed=/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/meth/vcf_meth/missing_bed/chr${ch}_missing
-bam=/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/data/raw/COLO829/chr${ch}-COLO829.bam
-fasta=/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
-out=/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/meth/vcf_meth/missing_bed/missing_tumor_chr${ch}
+bed="/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/meth/bed_meth/chr${ch}_tumor_meth"
+bam="/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/data/raw/COLO829/chr${ch}-COLO829.bam"
+fasta="/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
+out="/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/meth/vcf_meth/missing_bed/missing_tumor_chr${ch}"
 
 bcftools mpileup -Ou -f $fasta $bam -R $bed \
 	-Q 0 \
