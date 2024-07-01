@@ -32,12 +32,14 @@ NT = Normal and Tumor **Together**
     - input: `{sample}.bed`
     - output: `chr{c}_{sample}_meth.rds`
 
-7. `5_combine.R`: N/T
+7. `5_combine.R`: NT
     
      **In parallel for each chromosome {c}**
     - input:
-      - `chr{c}_{sample}_meth.rds`
-      - `chr{c}_{sample}.vcf`
+      - `T_chr{c}_{sample}_meth.rds`
+      - `T_chr{c}_{sample}.vcf`
+      - `N_chr{c}_{sample}_meth.rds`
+      - `N_chr{c}_{sample}.vcf`
         
     - output: `chr{c}_{sample}_MAF.rds`
 
