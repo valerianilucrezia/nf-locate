@@ -26,26 +26,18 @@ NT = Normal and Tumor **Together**
       - `{sample}.bam`
     - output: `chr{c}_{sample}.vcf`
 
- 5. `4_read_vcf.R`: N/T
-    
-     **In parallel for each chromosome {c}**
-    - input: `chr{c}_{sample}.vcf`
-    - output: `chr{c}_{sample}_af.rds`
-
- 6. `5_read_bed.R`: N/T
+ 6. `4_read_bed.R`: N/T
     
      **In parallel for each chromosome {c}**
     - input: `{sample}.bed`
     - output: `chr{c}_{sample}_meth.rds`
 
-7. `6_combine.R`: NT
+7. `5_combine.R`: N/T
     
      **In parallel for each chromosome {c}**
     - input:
-      - `T_chr{c}_{sample}_meth.rds`
-      - `T_chr{c}_{sample}_af.rds`
-      - `N_chr{c}_{sample}_meth.rds`
-      - `N_chr{c}_{sample}_af.rds`
+      - `chr{c}_{sample}_meth.rds`
+      - `chr{c}_{sample}.vcf`
         
     - output: `chr{c}_{sample}_MAF.rds`
 
@@ -70,13 +62,6 @@ NT = Normal and Tumor **Together**
     - input: `chr{c}_{sample}.vcf`
     - output: `chr{c}_{sample}.rds`
   
-3. `4_combine_vcf.R`: NT
-    
-     **In parallel for each chromosome {c}**
-    - input:
-      - `T_chr{c}_{sample}.rds`
-      - `N_chr{c}_{sample}.rds`
-    - output: `chr{c}_{sample}.rds`
 
 ## Variant Calling Workflow
 1. `1_clairS.sh`: NT
