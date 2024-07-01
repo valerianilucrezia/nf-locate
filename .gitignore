@@ -1,0 +1,5 @@
+*.out*
+*log*
+.Rhistory
+**.DS_Store
+**_*
