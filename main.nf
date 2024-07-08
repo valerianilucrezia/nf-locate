@@ -3,8 +3,9 @@ nextflow.enable.dsl=2
 
 include { METYLATION } from "${baseDir}/subworkflows/methylation/main"
 include { PILEUP } from "${baseDir}/subworkflows/pileup/main"
-include { SMOOTHING } from "${baseDir}/subworkflows/smoothing/main"
 include { VARIANT_CALLING } from "${baseDir}/subworkflows/variant_calling/main"
+//include { SMOOTHING } from "${baseDir}/subworkflows/smoothing/main"
+
 
 workflow {  
     input_tumor = Channel.fromPath(params.samples).
