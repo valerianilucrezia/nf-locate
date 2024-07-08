@@ -1,12 +1,12 @@
 # LR_Pipeline_DNA
+<img width="958" alt="Screenshot 2024-07-08 alle 15 58 52" src="https://github.com/valerianilucrezia/LR_Pipeline_DNA/assets/72545549/04d31099-6b46-4df9-b404-ff0bb555ec14">
 
-![lr_data](https://github.com/valerianilucrezia/LR_Pipeline_DNA/assets/72545549/d37b9fa1-46fc-4ba1-a793-20329223a100)
 
 N/T = Normal and Tumor **Separately**
 
 NT = Normal and Tumor **Together**
 
-## Methylation Workflow
+## `methylation_calling` workflow
 1. `1_modkit.sh`: N/T
     - input: `{sample}.bam`
     - output: `{sample}.bed`
@@ -43,7 +43,7 @@ NT = Normal and Tumor **Together**
         
     - output: `chr{c}_{sample}_MAF.rds`
 
-## Pileup Workflow
+## `pileup` workflow
 1. `1_split_bam.sh`: N/T
     - input: `{sample}.bam`
     - output:
@@ -58,14 +58,22 @@ NT = Normal and Tumor **Together**
       - `chr{c}_pos.bed`
     - output: `chr{c}_{sample}.vcf`
 
-3. `3_read_vcf.R`: N/T
+3. `3_whatshap.R`: N/T
     
      **In parallel for each chromosome {c}**
-    - input: `chr{c}_{sample}.vcf`
-    - output: `chr{c}_{sample}.rds`
+    - input:
+        - `chr{c}_{sample}.bam`
+        - `chr{c}_{sample}.vcf`
+    - output:  `phased_chr{c}_{sample}.vcf`
+  
+4. `4_read_vcf_phasing.R`: N/T
+    
+     **In parallel for each chromosome {c}**
+    - input:   `phased_chr{c}_{sample}.vcf`
+    - output:  `phased_chr{c}_{sample}.rds`
   
 
-## Variant Calling Workflow
+## `variant_calling` workflow
 1. `1_clairS.sh`: NT
     - input:
       - `T_{sample}.bam`
