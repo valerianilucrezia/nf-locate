@@ -66,10 +66,12 @@ NT = Normal and Tumor **Together**
         - `chr{c}_{sample}.vcf`
     - output:  `phased_chr{c}_{sample}.vcf`
   
-4. `4_read_vcf_phasing.R`: N/T
+4. `4_read_vcf_phasing.R`: NT
     
      **In parallel for each chromosome {c}**
-    - input:   `phased_chr{c}_{sample}.vcf`
+    - input:
+        - `T_phased_chr{c}_{sample}.vcf`
+        - `N_phased_chr{c}_{sample}.vcf`
     - output:  `phased_chr{c}_{sample}.rds`
   
 
