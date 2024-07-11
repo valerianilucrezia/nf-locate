@@ -1,7 +1,7 @@
 ## To do
 ### General
 - [ ] write `main.nf` workflow
-- [ ] add singularity images
+- [x] add singularity images
 
 
 ### `variant_calling`
