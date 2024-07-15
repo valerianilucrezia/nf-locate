@@ -1,2 +1,2 @@
 sample,tumor_bam,tumor_bai,normal_bam,normal_bai
-COLO829,/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/data/raw/COLO829/COLO829.bam,/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/data/raw/COLO829/COLO829.bam.bai,/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/data/raw/COLO829_L/COLO829_L.bam,/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/data/raw/COLO829_L/COLO829_L.bam.bai
+COLO829,/orfeo/scratch/area/lvaleriani/LR_COLO829/COLO829.bam,/orfeo/scratch/area/lvaleriani/LR_COLO829/COLO829.bam.bai,/orfeo/scratch/area/lvaleriani/LR_COLO829/COLO829_L.bam,/orfeo/scratch/area/lvaleriani/LR_COLO829/COLO829_L.bam.bai
