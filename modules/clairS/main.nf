@@ -20,7 +20,7 @@ process CLAIRS {
   publishDir params.outdir, mode: 'copy'
   container 'docker://hkubal/clairs:latest'
   cpus 2
-  memory '50 GB'
+  memory '200 GB'
 
   input:
    path tumor_bam
