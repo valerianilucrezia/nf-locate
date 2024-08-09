@@ -6,7 +6,6 @@
 #SBATCH --mem 50g
 #SBATCH --time=48:00:00
 
-
 tumour=""
 normal=""
 outdir=""
