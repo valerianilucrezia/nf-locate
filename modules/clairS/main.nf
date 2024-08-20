@@ -7,7 +7,7 @@ params.normal_bai = '/u/area/ffabris/fast/long_reads_pipeline/test_data/full_chr
 params.ref_genome = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna'
 params.ref_fai = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai'
 
-params.outdir = "${workflow.launchDir}/results/clairS/"
+params.outdir = "${workflow.launchDir}/results/"
 
 tumor_bam_ch = Channel.fromPath(params.tumor_bam, checkIfExists: true) 
 tumor_bai_ch = Channel.fromPath(params.tumor_bai, checkIfExists: true) 
@@ -33,7 +33,9 @@ process CLAIRS {
    path ref_fai
 
   output:
-   path 'variants.vcf.gz', emit: 'vcf_files'
+   path '*.vcf.gz', emit: 'vcf_files'
+   path '*.tbi', emit: 'tbi_files'
+
 
 
 script:
@@ -46,7 +48,7 @@ script:
     --ref_fn="${ref_genome}"\
     --threads="${task.cpus}" \
     --platform="ont_r9_guppy" \
-    --output_dir="${params.outdir}" \
+    --output_dir="clairS/" \
     --output_prefix="variants" \
     --snv_min_af=0.05 \
     --enable_clair3_germline_output \
