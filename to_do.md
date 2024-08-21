@@ -10,11 +10,11 @@
 - [x] write `modules/read_vcf/main_somatic.nf` using `scripts/variant_calling/2_read_vcf_somatic.R`
 
 ### `pileup`
-- [ ] take `.bed` input files from `scripts/pileup/hg38_positions.zip`
+- [x] take `.bed` input files from `scripts/pileup/hg38_positions.zip`
 
 - [ ] write `main.nf` of the sub-workflow `subworkflows/pileup/main.nf`
 - [ ] write `modules/split_bam/main.nf` using `scripts/pileup/1_split_bam.sh`
-- [ ] write `modules/pileup/main.nf` using `scripts/pileup/2_pileup.sh`
+- [x] write `modules/pileup/main.nf` using `scripts/pileup/2_pileup.sh`
 - [ ] write `modules/whatshap/main.nf` using `scripts/pileup/3_whatshap.sh`
 - [ ] write `modules/read_vcf/main.nf` using `scripts/pileup/4_read_vcf_phasing.sh`
 
