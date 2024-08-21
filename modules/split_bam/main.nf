@@ -12,6 +12,7 @@ process SPLIT_BAM {
   tag "chr${ch}"
   publishDir "${params.outdir}split_bam/", mode: 'copy'
   container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
+  memory '50 GB'
   
   input:
     tuple val(ch), path(sample_bam)
