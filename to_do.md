@@ -6,8 +6,8 @@
 
 ### `variant_calling`
 - [ ] write `main.nf` of the sub-workflow `subworkflows/variant_calling/main.nf`
-- [ ] write `modules/clairS/main.nf` using `scripts/variant_calling/1_clairS.sh`
-- [ ] write `modules/read_vcf/main_somatic.nf` using `scripts/variant_calling/2_read_vcf_somatic.R`
+- [x] write `modules/clairS/main.nf` using `scripts/variant_calling/1_clairS.sh`
+- [x] write `modules/read_vcf/main_somatic.nf` using `scripts/variant_calling/2_read_vcf_somatic.R`
 
 ### `pileup`
 - [ ] take `.bed` input files from `scripts/pileup/hg38_positions.zip`

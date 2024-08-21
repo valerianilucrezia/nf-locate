@@ -7,7 +7,9 @@ params.normal_bai = '/u/area/ffabris/fast/long_reads_pipeline/test_data/full_chr
 params.ref_genome = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna'
 params.ref_fai = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai'
 
-params.outdir = "${workflow.launchDir}/results/"
+params.outdir_old = "${workflow.launchDir}/results/"
+params.outdir = "/orfeo/cephfs/scratch/area/ffabris/LR_Pipeline_scratch/results/"
+
 
 tumor_bam_ch = Channel.fromPath(params.tumor_bam, checkIfExists: true) 
 tumor_bai_ch = Channel.fromPath(params.tumor_bai, checkIfExists: true) 
@@ -17,7 +19,7 @@ ref_genome_ch = Channel.fromPath(params.ref_genome, checkIfExists: true)
 ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
 
 process CLAIRS {
-  publishDir params.outdir, mode: 'copy'
+  publishDir "${params.outdir}clairS/", mode: 'copy'
   container 'docker://hkubal/clairs:latest'
   cpus 8
   memory '200 GB'
@@ -33,12 +35,10 @@ process CLAIRS {
    path ref_fai
 
   output:
-   path '*.vcf.gz', emit: 'vcf_files'
-   path '*.tbi', emit: 'tbi_files'
+    path '*.vcf.gz', emit: 'vcf_files' , optional: true
+    path '*.tbi', emit: 'tbi_files', optional: true
 
-
-
-script:
+ script:
     """
     #!/usr/bin/env bash
     
@@ -48,7 +48,7 @@ script:
     --ref_fn="${ref_genome}"\
     --threads="${task.cpus}" \
     --platform="ont_r9_guppy" \
-    --output_dir="clairS/" \
+    --output_dir="" \
     --output_prefix="variants" \
     --snv_min_af=0.05 \
     --enable_clair3_germline_output \
