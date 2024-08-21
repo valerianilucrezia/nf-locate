@@ -1,14 +1,14 @@
 #!/usr/bin/env nextflow
 
-params.outdir = '/u/area/ffabris/fast/long_reads_pipeline/results/read_somatic/'
 params.rscript = '/u/area/ffabris/fast/long_reads_pipeline/LR_Pipeline_DNA/bin/read_vcf_somatic.R'
-params.vcf_file = '/u/area/ffabris/fast/long_reads_pipeline/results/clairS/'
+params.outdir = "${workflow.launchDir}/results/"
+params.vcf_file = "${workflow.launchDir}/results/clairS/variants.vcf.gz"
 
 rscript_ch = Channel.fromPath(params.rscript, checkIfExists: true) 
 vcf_file_ch = Channel.fromPath(params.vcf_file, checkIfExists: true) 
 
 process READ_SOMATIC {
-    publishDir params.outdir, mode: 'copy'
+    publishDir "${params.outdir}read_somatic/", mode: 'copy'
     container 'docker://lvaleriani/long_reads:latest'
     memory '16 GB'
 
@@ -17,13 +17,12 @@ process READ_SOMATIC {
         path vcf_file
 
     output:
-        path 'read_somatic.log'
+        path '*.RDS', emit: 'RDS_file'
 
     script:
     """
         #!/usr/bin/env bash
-        which Rscript > read_somatic.log
-        Rscript "${rscript}" "${params.vcf_file}" "${params.outdir}" >> read_somatic.log
+        Rscript "${rscript}" "${vcf_file}" "" 
     """
 }
 
