@@ -1,14 +1,27 @@
-process READ_BED {
 
-    publishDir params.publish_dir, mode: 'copy'
+
+rscript_ch = Channel.fromPath(params.rscript, checkIfExists: true) 
+
+
+process READ_BED {
+    publishDir "${workflow.launchDir}/results/read_somatic/", mode: 'copy'
+    container 'docker://lvaleriani/long_reads:latest'
+    memory '16 GB'
 
     input:
-   
-  
+        tuple path(rscript), path(vcf_file)
+        
+
     output:
+        path '*.RDS', emit: 'RDS'
 
     script:
+    """
+        #!/usr/bin/env bash
+        Rscript "${rscript}" "${vcf_file}" "" 
+    """
+}
 
-    """
-    """
+workflow {
+    READ_BED(rscript_ch)
 }

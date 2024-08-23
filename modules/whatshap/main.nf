@@ -3,8 +3,8 @@
 params.outdir = "${workflow.launchDir}/results/"
 params.ref_genome = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna'
 params.ref_fai = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai'
-params.bam_data="/u/area/ffabris/fast/long_reads_pipeline/tests/results/split_bam"
-params.vcf_data="/u/area/ffabris/fast/long_reads_pipeline/tests/results/pileup_cn"
+params.bam_data="/u/area/ffabris/fast/long_reads_pipeline/tests/pielup_pipeline/results/split_bam"
+params.vcf_data="/u/area/ffabris/fast/long_reads_pipeline/tests/pielup_pipeline/results/pileup_cn"
 
 chr_ch_old = Channel.from(1..22)
 chr_ch = Channel.from(1)
@@ -40,8 +40,7 @@ process WHATSHAP {
 
         whatshap phase -o "" \
             --ignore-read-groups \
-            --reference \
-            ${ref} \
+            --reference ${ref} \
             \${INPUT_VCF} \
             \${INPUT_BAM}
         """

@@ -1,10 +1,10 @@
 #!/usr/bin/env nextflow
 
 params.outdir = "${workflow.launchDir}/results/"
-params.bam_data = '/u/area/ffabris/fast/long_reads_pipeline/test_data/'
+params.bam_data = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/data/raw/COLO829'
 
 chr_ch = Channel.from(1..22)
-bam_ch = Channel.fromPath("${params.bam_data}*.bam", checkIfExists: true) 
+bam_ch = Channel.fromPath(params.bam_data, checkIfExists: true) 
 chr_bam_ch = chr_ch.combine(bam_ch)
 
 
@@ -12,7 +12,9 @@ process SPLIT_BAM {
   tag "chr${ch}"
   publishDir "${params.outdir}split_bam/", mode: 'copy'
   container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
-  memory '50 GB'
+  memory '200 GB'
+  time '10h'
+
   
   input:
     tuple val(ch), path(sample_bam)
@@ -24,10 +26,9 @@ process SPLIT_BAM {
   script:
     """
     #!/usr/bin/env bash
-    OUTPUT_NAME_BAM=\"chr${ch}-${sample_bam}\"
 
-    samtools view -b -h -o \${OUTPUT_NAME_BAM} ${sample_bam} "chr${ch}"
-    samtools index \${OUTPUT_NAME_BAM}
+    samtools view -b -h -o "chr${ch}-COLO829.bam" "${sample_bam}/COLO829.bam" "chr${ch}"
+    samtools index "chr${ch}-COLO829.bam"
 
     """
 
