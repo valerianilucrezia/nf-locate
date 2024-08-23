@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process CLAIRS {
-  publishDir "${params.outdir}clairS/", mode: 'copy'
+  publishDir "${workflow.launchDir}/results/clairS/", mode: 'copy'
   container 'docker://hkubal/clairs:latest'
   cpus 8
   memory '200 GB'

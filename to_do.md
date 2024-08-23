@@ -5,7 +5,7 @@
 
 
 ### `variant_calling`
-- [ ] write `main.nf` of the sub-workflow `subworkflows/variant_calling/main.nf`
+- [x] write `main.nf` of the sub-workflow `subworkflows/variant_calling/main.nf`
 - [x] write `modules/clairS/main.nf` using `scripts/variant_calling/1_clairS.sh`
 - [x] write `modules/read_vcf/main_somatic.nf` using `scripts/variant_calling/2_read_vcf_somatic.R`
 
