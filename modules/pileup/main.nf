@@ -2,17 +2,19 @@
 
 params.outdir = "${workflow.launchDir}/results/"
 params.ref_genome = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna'
+params.ref_fai = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai'
 params.bam_data="${workflow.launchDir}/results/split_bam"
 params.bed_data="/u/area/ffabris/fast/long_reads_pipeline/test_data/pos"
 
 //work harder or input files to be more general
 
-chr_ch = Channel.from(1..22)
+chr_ch = Channel.from(1..4)//Channel.from(1..22)
 bam_ch = Channel.fromPath(params.bam_data, checkIfExists: true) 
 bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true) 
 ref_genome_ch = Channel.fromPath(params.ref_genome, checkIfExists: true) 
+ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
 
-combined_ch = chr_ch.combine(bam_ch.combine(bed_ch).combine(ref_genome_ch))
+combined_ch = chr_ch.combine(bam_ch.combine(bed_ch).combine(ref_genome_ch).combine(ref_fai_ch))
 
 
 
@@ -21,10 +23,11 @@ process PILEUP_CN {
     publishDir "${params.outdir}pileup_cn/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.9--ha228f0b_4'
     memory '200 GB'
-    time '10h'
+    time '48h'
+    cpus 12
 
     input:
-      tuple val(ch), path(sample_bam), path(sample_bed), path (ref)
+      tuple val(ch), path(sample_bam), path(sample_bed), path(ref), path(ref_fai)
 
     output:
       path '*.vcf', emit: 'vcf' 
@@ -44,6 +47,5 @@ process PILEUP_CN {
 }
 
 workflow {
-    combined_ch.view()
     split_bam_ch = PILEUP_CN(combined_ch)
 }

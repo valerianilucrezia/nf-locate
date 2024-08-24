@@ -14,10 +14,9 @@ ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
 process MODKIT {
     publishDir "${workflow.launchDir}/results/modkit/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/ont-modkit%3A0.3.1--h5c23e0d_1'
-    cpus 8
+    cpus 12
     memory '100 GB'
-    maxForks 1
-    time '2h'
+    time '12h'
 
     
     input:
@@ -33,8 +32,7 @@ process MODKIT {
     script:
     """
     modkit pileup "${bam}" "COLO829.bed" --ignore h --ref "${ref_genome}" --cpg --combine-strands --log-filepath "COLO829_pileup.log" -t 24
-    modkit pileup "${bam}" "COLO829_bystrand.bed" --ignore h --ref "${ref_genome}" --log-filepath "COLO829_pileup_bystrand.log" -t 10
-
+    modkit pileup "${bam}" "COLO829_bystrand.bed" --ignore h --ref "${ref_genome}" --log-filepath "COLO829_pileup_bystrand.log" -t 12
     """
 }
 

@@ -19,7 +19,7 @@ process GET_POSITIONS {
 
     script:
     """
-    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print $1, $3}' > $"chr${ch}"_tumor_meth.bed
+    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$3}' > $"chr${ch}"_tumor_meth.bed
     """
 }
 
