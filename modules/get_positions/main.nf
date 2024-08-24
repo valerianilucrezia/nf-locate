@@ -1,4 +1,4 @@
-params.bed_data="${workflow.launchDir}/results/COLO829.bed"
+params.bed_data="${workflow.launchDir}/results/modkit/COLO829.bed"
 
 chr_ch = Channel.from(1..22)
 bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true) 
@@ -19,7 +19,7 @@ process GET_POSITIONS {
 
     script:
     """
-    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$3}' > $"chr${ch}"_tumor_meth.bed
+    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$3}' > "chr${ch}"_COLO829_meth.bed
     """
 }
 

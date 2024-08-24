@@ -21,7 +21,7 @@
 ### `methylation_calling`
 - [ ] write `main.nf` of the sub-workflow `subworkflows/methylation/main.nf`
 - [x] write `modules/modkit/main.nf` using `scripts/methylation/1_modkit.sh`
-- [ ] write `modules/get_positions/main.nf` using `scripts/methylation/2_get_position.sh`
+- [x] write `modules/get_positions/main.nf` using `scripts/methylation/2_get_position.sh`
 - [ ] write `modules/pileup_methylation/main.nf` using `scripts/methylation/3_pileup.sh`
 - [ ] write `modules/read_bed/main.nf` using `scripts/methylation/4_read_bed.R`
 - [ ] write `modules/combine_methylation/main.nf` using `scripts/methylation/5_combine.R`
