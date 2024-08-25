@@ -36,5 +36,5 @@ process READ_PHASING {
 }
 
 workflow {
-    combine_ch = READ_PHASING(input_ch)
+    read_phasing_ch = READ_PHASING(input_ch)
 }

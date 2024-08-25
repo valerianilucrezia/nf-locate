@@ -3,13 +3,18 @@ params.ref_fai = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15
 params.bam_data = '/u/area/ffabris/fast/long_reads_pipeline/tests/pielup_pipeline/results/split_bam'
 params.bed_data = "${workflow.launchDir}/results/get_positions"
 
-
 chr_ch = chr_ch = Channel.from(1) //Channel.from(1..22)
 bam_ch = Channel.fromPath(params.bam_data, checkIfExists: true) 
 bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true) 
 ref_genome_ch = Channel.fromPath(params.ref_genome, checkIfExists: true) 
+ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true) 
 
-combined_ch = chr_ch.combine(bam_ch.combine(bed_ch).combine(ref_genome_ch))
+combined_ch = chr_ch
+                .combine(bam_ch)
+                .combine(bed_ch)
+                .combine(ref_genome_ch)
+                .combine(ref_fai_ch)
+
 
 process METH_PILEUP {
     tag "chr${ch}"
@@ -20,7 +25,7 @@ process METH_PILEUP {
     time '24h'
 
     input:
-    tuple val(ch), path(bam), path(bed), path(ref)
+    tuple val(ch), path(bam), path(bed), path(ref), path(fai)
   
     output:
     path "*.vcf", emit:'vcf'
