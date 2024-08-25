@@ -1,4 +1,4 @@
-params.bed_data="${workflow.launchDir}/results/modkit/COLO829.bed"
+params.bed_data = "${workflow.launchDir}/results/modkit/COLO829.bed"
 
 chr_ch = Channel.from(1..22)
 bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true) 
@@ -12,14 +12,15 @@ process GET_POSITIONS {
 
     input:
     tuple val(ch), path(bed)
-   
-  
+
     output:
-    path '*.bed', emit:'bed'
+    path '*.bed', emit: 'bed'
 
     script:
     """
-    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$3}' > "chr${ch}"_COLO829_meth.bed
+    # Filter the BED file to include only lines corresponding to chromosome ${ch}
+    # and generate a new BED file with the format: chromosome, start position, end position
+    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$2, \$3}' > "chr${ch}_COLO829_meth.bed"
     """
 }
 
