@@ -23,7 +23,7 @@ process PILEUP_CN {
     publishDir "${params.outdir}pileup_cn/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.9--ha228f0b_4'
     memory '200 GB'
-    time '48h'
+    time '72h'
     cpus 12
 
     input:

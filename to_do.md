@@ -25,3 +25,24 @@
 - [ ] write `modules/pileup_methylation/main.nf` using `scripts/methylation/3_pileup.sh`
 - [ ] write `modules/read_bed/main.nf` using `scripts/methylation/4_read_bed.R`
 - [ ] write `modules/combine_methylation/main.nf` using `scripts/methylation/5_combine.R`
+
+
+## To do - FF 
+### General
+- [ ] write `main.nf` workflow
+- [ ] get a *testing dataset*
+- [ ] tune general HPC default parameters
+- [ ] improve channel architecture 
+- [ ] write the code for more general inputs
+
+### `methylation_calling`
+- [ ] test `modules/pileup_methylation/main.nf` 
+- [ ] test `modules/read_bed/main.nf` 
+- [ ] test `modules/combine_methylation/main.nf`
+- [ ] test `main.nf` of the sub-workflow 
+
+### `pileup`
+- [ ] test `modules/pileup/main.nf`
+- [ ] test `modules/whatshap/main.nf` 
+- [ ] test `modules/read_vcf/main.nf` 
+- [ ] test `main.nf` of the sub-workflow `
