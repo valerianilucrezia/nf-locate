@@ -19,9 +19,9 @@ combined_ch = chr_ch
 process METH_PILEUP {
     tag "chr${ch}"
     publishDir "${workflow.launchDir}/results/pileup_meth", mode: 'copy'
-    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.9--ha228f0b_4'
+    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--h3cc50cf_1'
     memory '100 GB'
-    cpus 6
+    cpus 12
     time '24h'
 
     input:
@@ -37,9 +37,8 @@ process METH_PILEUP {
         -f ${ref} ${bam}/chr${ch}-COLO829.bam \
         -R ${bed}/chr${ch}_COLO829_meth.bed \
         -Q 0 \
-        --threads 6 \
-        --annotate FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP,INFO/AD,INFO/ADF,INFO/ADR | \
-        bcftools call -Ov -m --threads 6 -o missing_tumor_chr${ch}.vcf
+        --threads 12 \
+        --annotate FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP,INFO/AD,INFO/ADF,INFO/ADR | bcftools call -Ov -m --threads 12 -o missing_tumor_chr${ch}.vcf
     """
 }
 

@@ -17,11 +17,10 @@ ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
 combined_ch = chr_ch.combine(bam_ch.combine(bed_ch).combine(ref_genome_ch).combine(ref_fai_ch))
 
 
-
 process PILEUP_CN {
     tag "chr${ch}"
     publishDir "${params.outdir}pileup_cn/", mode: 'copy'
-    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.9--ha228f0b_4'
+    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--h3cc50cf_1'
     memory '200 GB'
     time '72h'
     cpus 12
@@ -41,8 +40,7 @@ process PILEUP_CN {
       bcftools mpileup -Ou \${INPUT_BAM} -R \${INPUT_BED} -f ${ref} \
         --annotate FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP,INFO/AD,INFO/ADF,INFO/ADR \
         -Q 0 \
-        --threads 12 \
-        | bcftools call -Ov -m --threads 12 -o \${OUTPUT_VCF}
+        --threads 12 | bcftools call -Ov -m --threads 12 -o \${OUTPUT_VCF}
       """
 }
 
