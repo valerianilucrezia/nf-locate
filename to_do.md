@@ -2,7 +2,7 @@
 ### General
 - [ ] write `main.nf` workflow
 - [x] add singularity images
-
+- [ ] need to change `modules/read_vcf/main.nf`to do the correct stuff
 
 ### `variant_calling`
 - [x] write `main.nf` of the sub-workflow `subworkflows/variant_calling/main.nf`
@@ -15,8 +15,8 @@
 - [ ] write `main.nf` of the sub-workflow `subworkflows/pileup/main.nf`
 - [x] write `modules/split_bam/main.nf` using `scripts/pileup/1_split_bam.sh`
 - [x] write `modules/pileup/main.nf` using `scripts/pileup/2_pileup.sh`
-- [ ] write `modules/whatshap/main.nf` using `scripts/pileup/3_whatshap.sh`
-- [ ] write `modules/read_vcf/main.nf` using `scripts/pileup/4_read_vcf_phasing.sh`
+- [x] write `modules/whatshap/main.nf` using `scripts/pileup/3_whatshap.sh`
+- [x] write `modules/read_vcf/main.nf` using `scripts/pileup/4_read_vcf_phasing.sh`
 
 ### `methylation_calling`
 - [ ] write `main.nf` of the sub-workflow `subworkflows/methylation/main.nf`
@@ -42,7 +42,7 @@
 - [ ] test `main.nf` of the sub-workflow 
 
 ### `pileup`
-- [ ] test `modules/pileup/main.nf`
-- [ ] test `modules/whatshap/main.nf` 
-- [ ] test `modules/read_vcf/main.nf` 
+- [x] test `modules/pileup/main.nf`
+- [x] test `modules/whatshap/main.nf` 
+- [x] test `modules/read_vcf/main.nf` 
 - [ ] test `main.nf` of the sub-workflow `

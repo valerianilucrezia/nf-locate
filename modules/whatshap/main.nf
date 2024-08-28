@@ -5,8 +5,7 @@ params.ref_fai = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15
 params.bam_data="${workflow.launchDir}/results/split_bam"
 params.vcf_data="${workflow.launchDir}/results/pileup_cn"
 
-chr_ch_old = Channel.from(1..22)
-chr_ch = Channel.from(1)
+chr_ch = Channel.from(1..4)//Channel.from(1..22)
 bam_ch = Channel.fromPath(params.bam_data, checkIfExists: true) 
 vcf_ch = Channel.fromPath(params.vcf_data, checkIfExists: true) 
 ref_genome_ch = Channel.fromPath(params.ref_genome, checkIfExists: true) 
@@ -22,8 +21,9 @@ process WHATSHAP {
     tag "chr${ch}"
     publishDir "${workflow.launchDir}/results/whatshap/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/whatshap%3A2.3--py39h1f90b4d_0'
-    memory '50 GB'
-    maxForks 24
+    memory '200 GB'
+    time '12h'
+    cpus 12
 
     input:
         tuple val(ch), path(sample_bam), path(sample_vcf), path(ref), path (ref_fai)
@@ -35,10 +35,11 @@ process WHATSHAP {
     script:
 
         """
-        INPUT_BAM="${sample_bam}/chr${ch}-full_chr1_COLO829_L.bam"
+        INPUT_BAM="${sample_bam}/chr${ch}-COLO829.bam"
         INPUT_VCF="${sample_vcf}/g100_chr${ch}.vcf"
+        OUTPUT_VCF="phased_g100_chr${ch}.vcf"
 
-        whatshap phase -o "" \
+        whatshap phase -o \${OUTPUT_VCF} \
             --ignore-read-groups \
             --reference ${ref} \
             \${INPUT_VCF} \

@@ -1,6 +1,5 @@
 #!/usr/bin/env nextflow
 
-params.outdir = "${workflow.launchDir}/results/"
 params.ref_genome = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna'
 params.ref_fai = '/orfeo/LTS/LADE/LT_storage/lvaleriani/CNA/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai'
 params.bam_data="${workflow.launchDir}/results/split_bam"
@@ -14,15 +13,19 @@ bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true)
 ref_genome_ch = Channel.fromPath(params.ref_genome, checkIfExists: true) 
 ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
 
-combined_ch = chr_ch.combine(bam_ch.combine(bed_ch).combine(ref_genome_ch).combine(ref_fai_ch))
+combined_ch = chr_ch
+                  .combine(bam_ch)
+                  .combine(bed_ch)
+                  .combine(ref_genome_ch)
+                  .combine(ref_fai_ch)
 
 
 process PILEUP_CN {
     tag "chr${ch}"
-    publishDir "${params.outdir}pileup_cn/", mode: 'copy'
-    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--h3cc50cf_1'
+    publishDir "${workflow.launchDir}/results/modkit/", mode: 'copy'
+    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
     memory '200 GB'
-    time '72h'
+    time '12h'
     cpus 12
 
     input:
