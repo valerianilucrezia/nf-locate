@@ -1,41 +1,26 @@
 #!/usr/bin/env nextflow
 
-params.rscript = '/u/area/ffabris/fast/long_reads_pipeline/LR_Pipeline_DNA/bin/read_phasing.R'
-params.vcf = '/u/area/ffabris/fast/long_reads_pipeline/tests/pielup_pipeline/results/whatshap/'
-//params.vcf = "${workflow.launchDir}/results/whatshap"
-
-rscript_ch = Channel.fromPath(params.rscript, checkIfExists: true) 
-chr_ch = Channel.from(1..4)
-vcf_ch = Channel.fromPath(params.vcf, checkIfExists: true)
-
-input_ch = rscript_ch
-            .combine(chr_ch)
-            .combine(vcf_ch)
-
 process READ_PHASING {
+    tag "chr${chr}"
     publishDir "${workflow.launchDir}/results/read_phasing/", mode: 'copy'
     container 'docker://lvaleriani/long_reads:latest'
     memory '30 GB'
-    tag "chr${chr}"
 
     input:
-        tuple path(rscript), val(chr), path(vcf_files)
+        tuple val(t_name), val(n_name), val(chr), path(t_chr_phased_vcf), path(n_chr_phased_vcf)
+        path(rscript)
 
     output:
-        path '*.RDS', emit: 'RDS'
+        path '*.RDS', emit: 'chr_rds'
 
     script:
     """
         #!/usr/bin/env bash
 
-        VCF_TUMOR="${vcf_files}/phased_g100_chr${chr}.vcf"
-        VCF_NORMAL="${vcf_files}/phased_g100_chr${chr}.vcf"
+        VCF_TUMOR="${t_chr_phased_vcf}"
+        VCF_NORMAL="${n_chr_phased_vcf}"
 
         Rscript "${rscript}" "${chr}" "\${VCF_TUMOR}" "\${VCF_NORMAL}"  
 
     """
-}
-
-workflow {
-    read_phasing_ch = READ_PHASING(input_ch)
 }

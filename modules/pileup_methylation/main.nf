@@ -19,7 +19,7 @@ combined_ch = chr_ch
 process METH_PILEUP {
     tag "chr${ch}"
     publishDir "${workflow.launchDir}/results/pileup_meth", mode: 'copy'
-    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
+    container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0' //'https://depot.galaxyproject.org/singularity/bcftools%3A1.20--h8b25389_1'
     memory '100 GB'
     cpus 12
     time '24h'

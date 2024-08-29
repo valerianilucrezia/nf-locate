@@ -34,6 +34,7 @@
 - [ ] tune general HPC default parameters
 - [ ] improve channel architecture 
 - [ ] write the code for more general inputs
+- [ ] test the pipelines with 2 datasets
 
 ### `methylation_calling`
 - [ ] test `modules/pileup_methylation/main.nf` 

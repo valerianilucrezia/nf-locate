@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 library(dplyr)
 library(vcfR)
 
@@ -10,8 +11,8 @@ get_join_meth <- function(c, vcf_tumor, vcf_normal, output_name) {
   #T_join <- inner_join(fix, gt)
 
     
-  N_vcf <- vcfR::read.vcfR(vcf_normal)
-  N_vcf <- vcfR::vcfR2tidy(N_vcf)
+  #N_vcf <- vcfR::read.vcfR(vcf_normal)
+  #N_vcf <- vcfR::vcfR2tidy(N_vcf)
   #fix <- N_vcf$fix %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, CHROM, POS, REF, ALT, FILTER)
   # gt <- N_vcf$gt %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, gt_DP, gt_AF, gt_AD) ---- old
   #gt <- N_vcf$gt %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, gt_DP)

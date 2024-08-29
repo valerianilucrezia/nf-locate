@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 process CLAIRS {
+  tag "${name}"
   publishDir "${workflow.launchDir}/results/clairS/", mode: 'copy'
   container 'docker://hkubal/clairs:latest'
   cpus 8
@@ -9,18 +10,12 @@ process CLAIRS {
   time '2h'
 
   input:
-   path tumor_bam
-   path tumor_bai
-   path normal_bam
-   path normal_bai
-   path ref_genome
-   path ref_fai
+   tuple val(name), path(tumor_bam), path(tumor_bai), path(normal_bam), path(normal_bai), path(ref_genome), path(ref_fai)
 
   output:
-    path '*.vcf.gz', emit: 'vcf' 
-    path '*.tbi', emit: 'tbi'
-
- script:
+    tuple val(name), path('*.vcf.gz'), emit: 'vcf' 
+ 
+  script:
     """
     #!/usr/bin/env bash
     

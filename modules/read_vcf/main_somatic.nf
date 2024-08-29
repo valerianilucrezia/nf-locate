@@ -1,20 +1,20 @@
-#!/usr/bin/env nextflow ooo
+#!/usr/bin/env nextflow
 
 process READ_SOMATIC {
+    tag "${name}"
     publishDir "${workflow.launchDir}/results/read_somatic/", mode: 'copy'
     container 'docker://lvaleriani/long_reads:latest'
     memory '16 GB'
 
     input:
-        tuple path(rscript), path(vcf_file)
+        tuple val(name), path(vcf_file)
         
-
     output:
-        path '*.RDS', emit: 'RDS'
+        tuple val(name), path('*.RDS'), emit: 'rds'
 
     script:
     """
         #!/usr/bin/env bash
-        Rscript "${rscript}" "${vcf_file}" "" 
+        read_vcf_somatic.R "${vcf_file}" "" 
     """
 }

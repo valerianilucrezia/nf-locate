@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
 process PILEUP_CN {
-    tag "${name}--chr${ch}"
-    publishDir "${workflow.launchDir}/results/modkit/", mode: 'copy'
+    tag "${name}-chr${ch}"
+    publishDir "${workflow.launchDir}/results/pileup_cn/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
     memory '200 GB'
     time '12h'
@@ -12,7 +12,7 @@ process PILEUP_CN {
       tuple val(name), val(ch), path(chr_bam), path(chr_bai), path(sample_bed), path(ref), path(ref_fai)
 
     output:
-      tuple val(name), val(ch), path('*.vcf'), emit: 'chr_vcf' 
+      tuple val(name), val(ch), path(chr_bam), path(chr_bai), path('*.vcf'), path(ref), path(ref_fai), emit: 'chr_vcf' 
 
     script:
       """
