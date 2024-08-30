@@ -1,29 +1,19 @@
-params.bed_data = "${workflow.launchDir}/results/modkit/COLO829.bed"
-
-chr_ch = Channel.from(1..22)
-bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true) 
-combined_ch = chr_ch.combine(bed_ch)
+#!/usr/bin/env nextflow
 
 process GET_POSITIONS {
-    tag "chr${ch}"
+    tag "${name}-chr${ch}"
     publishDir "${workflow.launchDir}/results/get_positions/", mode: 'copy'
     container 'docker://lvaleriani/long_reads:latest'
     memory '20 GB'
 
     input:
-    tuple val(ch), path(bed)
+    tuple val(ch), val(name), path(bed)
 
     output:
-    path '*.bed', emit: 'bed'
+    path '*.bed', emit: 'chr_bed'
 
     script:
     """
-    # Filter the BED file to include only lines corresponding to chromosome ${ch}
-    # and generate a new BED file with the format: chromosome, start position, end position
-    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$2, \$3}' > "chr${ch}_COLO829_meth.bed"
+    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$2, \$3}' > "chr${ch}_${name}_meth.bed"
     """
-}
-
-workflow {
-    get_positions_ch = GET_POSITIONS(combined_ch)
 }

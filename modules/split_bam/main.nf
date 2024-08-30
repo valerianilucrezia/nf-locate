@@ -8,7 +8,7 @@ process SPLIT_BAM {
   time '10h'
 
   input:
-    tuple val(name), val(ch), path(sample_bam), path(sample_bai)
+    tuple val(ch), val(name), path(sample_bam), path(sample_bai)
 
   output:
     tuple val(name), val(ch), path('*.bam'), path('*.bai'), emit: chr_bam

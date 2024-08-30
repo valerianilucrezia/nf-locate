@@ -12,7 +12,7 @@
 ### `pileup`
 - [x] take `.bed` input files from `scripts/pileup/hg38_positions.zip`
 
-- [ ] write `main.nf` of the sub-workflow `subworkflows/pileup/main.nf`
+- [x] write `main.nf` of the sub-workflow `subworkflows/pileup/main.nf`
 - [x] write `modules/split_bam/main.nf` using `scripts/pileup/1_split_bam.sh`
 - [x] write `modules/pileup/main.nf` using `scripts/pileup/2_pileup.sh`
 - [x] write `modules/whatshap/main.nf` using `scripts/pileup/3_whatshap.sh`
@@ -29,7 +29,7 @@
 
 ## To do - FF 
 ### General
-- [ ] write `main.nf` workflow
+- [ ] write `main.nf` workflow [done variant calling]
 - [ ] get a *testing dataset*
 - [ ] tune general HPC default parameters
 - [ ] improve channel architecture 
@@ -46,4 +46,4 @@
 - [x] test `modules/pileup/main.nf`
 - [x] test `modules/whatshap/main.nf` 
 - [x] test `modules/read_vcf/main.nf` 
-- [ ] test `main.nf` of the sub-workflow `
+- [x] test `main.nf` of the sub-workflow `

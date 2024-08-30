@@ -8,7 +8,6 @@ process READ_PHASING {
 
     input:
         tuple val(t_name), val(n_name), val(chr), path(t_chr_phased_vcf), path(n_chr_phased_vcf)
-        path(rscript)
 
     output:
         path '*.RDS', emit: 'chr_rds'
@@ -20,7 +19,7 @@ process READ_PHASING {
         VCF_TUMOR="${t_chr_phased_vcf}"
         VCF_NORMAL="${n_chr_phased_vcf}"
 
-        Rscript "${rscript}" "${chr}" "\${VCF_TUMOR}" "\${VCF_NORMAL}"  
+        read_phasing.R "${chr}" "\${VCF_TUMOR}" "\${VCF_NORMAL}"  
 
     """
 }
