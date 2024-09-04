@@ -2,6 +2,7 @@
 library(dplyr)
 library(data.table)
 library(vcfR)
+library(tidyr)  # added to "separate"
 
 # function to read a process vcf files 
 get_vcf <- function(file){
@@ -25,7 +26,7 @@ get_vcf <- function(file){
 }
 
 # Combines methylation and VCF data 
-get_meth <- function(mN, mT, vcfN, vcfT){
+get_meth <- function(chr, mT, mN, vcfT, vcfN){
   meth_normal <- mN  %>% 
     mutate(id = paste(chr, end, sep = ':')) %>% 
     select(-score, -strand)
@@ -37,15 +38,16 @@ get_meth <- function(mN, mT, vcfN, vcfT){
   vcf_normal <- get_vcf(vcfN)
   vcf_tumor <- get_vcf(vcfT)
   
-  normal <- full_join(meth_normal, vcf_normal)
-  tumor <- full_join(meth_tumor, vcf_tumor)
+  
+  normal <-meth_normal #full_join(meth_normal, vcf_normal)
+  tumor <- meth_tumor #full_join(meth_tumor, vcf_tumor)
   
 
   saveRDS(object = normal, file = paste0('normal_', chr, '.RDS')) 
   saveRDS(object = tumor, file = paste0('tumor_', chr, '.RDS'))
   
   
-  join_all <- inner_join(normal, tumor, suffix = c('_N', '_T'), by = join_by(id))
+  join_all <- inner_join(normal, tumor, by = "id", suffix = c('_N', '_T'))
   saveRDS(object = join_all, file = paste0('combined_', chr, '.RDS')) 
 }
 
@@ -59,8 +61,8 @@ chr <- args[1] # chromosome
 meth_tumor_rds <- readRDS(args[2]) # .RDS
 meth_normal_rds <- readRDS(args[3]) # .RDS
 
-meth_tumor_vcf <- readRDS(args[4]) #.vcf
-meth_normal_vcf <- readRDS(args[5]) #.vcf
+meth_tumor_vcf <- args[4] #readRDS(args[4]) #.vcf
+meth_normal_vcf <- args[5] #readRDS(args[5]) #.vcf
 
-get_meth(chr, meth_normal, meth_tumor, vcf_normal, vcf_tumor)
+get_meth(chr, meth_tumor_rds, meth_normal_rds, meth_tumor_vcf, meth_normal_vcf)
 

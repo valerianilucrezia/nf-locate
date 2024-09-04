@@ -10,10 +10,10 @@ process GET_POSITIONS {
     tuple val(ch), val(name), path(bed)
 
     output:
-    path '*.bed', emit: 'chr_bed'
+    tuple val(name), val(ch), path('*_meth'), emit: 'chr_bed'
 
     script:
     """
-    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$2, \$3}' > "chr${ch}_${name}_meth.bed"
+    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$3}' > "chr${ch}_${name}_meth"
     """
 }

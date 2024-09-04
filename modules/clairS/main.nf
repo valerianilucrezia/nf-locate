@@ -4,10 +4,9 @@ process CLAIRS {
   tag "${name}"
   publishDir "${workflow.launchDir}/results/clairS/", mode: 'copy'
   container 'docker://hkubal/clairs:latest'
-  cpus 8
+  cpus 1
   memory '200 GB'
-  maxForks 24
-  time '2h'
+  time '24h'
 
   input:
    tuple val(name), path(tumor_bam), path(tumor_bai), path(normal_bam), path(normal_bai), path(ref_genome), path(ref_fai)
@@ -23,7 +22,7 @@ process CLAIRS {
     --tumor_bam_fn="${tumor_bam}" \
     --normal_bam_fn="${normal_bam}"\
     --ref_fn="${ref_genome}"\
-    --threads="${task.cpus}" \
+    --threads=1 \
     --platform="ont_r9_guppy" \
     --output_dir="" \
     --output_prefix="variants" \

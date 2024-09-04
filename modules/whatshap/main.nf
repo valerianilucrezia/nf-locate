@@ -9,7 +9,7 @@ process WHATSHAP {
     cpus 12
 
     input:
-        tuple val(name), val(ch), path(chr_bam), path(chr_bai), path(chr_vcf), path(ref), path(ref_fai)
+        tuple val(name), val(ch), path(chr_vcf), path(chr_bam), path(chr_bai), path(ref), path(ref_fai)
 
     output:
         tuple val(name), val(ch), path('*.vcf'), emit: 'phased_chr_vcf' 

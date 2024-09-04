@@ -12,7 +12,7 @@ process PILEUP_CN {
       tuple val(name), val(ch), path(chr_bam), path(chr_bai), path(sample_bed), path(ref), path(ref_fai)
 
     output:
-      tuple val(name), val(ch), path(chr_bam), path(chr_bai), path('*.vcf'), path(ref), path(ref_fai), emit: 'chr_vcf' 
+      tuple val(name), val(ch), path('*.vcf'), emit: 'chr_vcf' 
 
     script:
       """

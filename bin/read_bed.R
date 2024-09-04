@@ -17,12 +17,12 @@ read_meth <- function(data, ch, out) {
 ### Processing a single chromosome
 ######################################################
 args <- commandArgs(trailingOnly = TRUE)
-out <- args[3] # output dir
+out <- args[3] # output dir / name
 bed_file <- args[2]   # path to the single bed file
 chr <- args[1] # chromosome
 
 file <- fread(bed_file, nThread = 2)
-colnames(file) <- c('chr', 'start', 'end', 'mod', 'score', 'strand', 'v1', 'v2', 'v3', 'N')
+colnames(file) <- c('chr', 'start', 'end', 'mod', 'score', 'strand', 'v1', 'v2', 'v3', 'N','aux1', 'aux2', 'aux3', 'aux4', 'aux5', 'aux6', 'aux7', 'aux8')
 
 data <- file %>%
   filter(chr == chr) %>%

@@ -28,8 +28,10 @@ workflow PILEUP {
                                             .combine(ref_fai_ch)
         pileupcn_ch = PILEUP_CN(input_pileupcn_ch)
     
-    // whatshap 
         input_whatshap_ch = pileupcn_ch.chr_vcf
+                                            .combine(splitbam_ch.chr_bam, by:[0,1])
+                                            .combine(ref_genome_ch)
+                                            .combine(ref_fai_ch)
         whatshap_ch = WHATSHAP(input_whatshap_ch)
 
     // phasing
@@ -41,7 +43,7 @@ workflow PILEUP {
         phasing_ch = READ_PHASING(input_phasing_ch)
 
     emit:
-        phasing_ch.chr_rds.flatten()
+        splitbam_ch.chr_bam
 
 }
 
