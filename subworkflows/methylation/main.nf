@@ -19,8 +19,8 @@ workflow METYLATION {
     main:
 
         //modkit
-        t_input_modkit_ch = t_ch.combine(t_ch).combine(ref_genome_ch).combine(ref_fai_ch)
-        n_input_modkit_ch = n_ch.combine(n_ch).combine(ref_genome_ch).combine(ref_fai_ch)
+        t_input_modkit_ch = t_ch.combine(ref_genome_ch).combine(ref_fai_ch)
+        n_input_modkit_ch = n_ch.combine(ref_genome_ch).combine(ref_fai_ch)
         input_modkit_ch = t_input_modkit_ch.mix(n_input_modkit_ch)
         modkit_ch = MODKIT(input_modkit_ch)
         
@@ -29,8 +29,7 @@ workflow METYLATION {
         get_positions_ch = GET_POSITIONS(input_getpositions_ch)
 
         //pileup meth
-        channel name bed
-        input_pilupmet_ch = get_positions_ch.chr_bed.combine(chr_bam_ch, by:[0,1])
+        input_pilupmet_ch = get_positions_ch.chr_bed.combine(chr_bam_ch, by: [0,1])
                                                 .combine(ref_genome_ch)
                                                 .combine(ref_fai_ch) 
         pileupmet_ch = METH_PILEUP(input_pilupmet_ch)
@@ -45,7 +44,7 @@ workflow METYLATION {
         input_combine_ch = readbed_rds_ch.combine(chr_vcf_ch,by:[0,1]).branch {
                                                                     tumor: it[0] == t_ch.first()
                                                                     normal: it[0] == n_ch.first() }
-        combine_ch = COMBINE(input_combine_ch.tumor.combine(input_combine_ch.normal,by=0))
+        combine_ch = COMBINE(input_combine_ch.tumor.combine(input_combine_ch.normal, by: 0))
 
     emit:
         combine_ch.chr_rds

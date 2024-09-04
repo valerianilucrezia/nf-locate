@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process COMBINE {
-    tag "chr${chr}"
+    tag "chr${chr}-${t_name}-${n_name}"
     publishDir "${workflow.launchDir}/results/combine_meth", mode: 'copy'
     container 'docker://lvaleriani/long_reads:latest'
     memory '50 GB'

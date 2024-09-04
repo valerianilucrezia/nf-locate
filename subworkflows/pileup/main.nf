@@ -29,7 +29,7 @@ workflow PILEUP {
         pileupcn_ch = PILEUP_CN(input_pileupcn_ch)
     
         input_whatshap_ch = pileupcn_ch.chr_vcf
-                                            .combine(splitbam_ch.chr_bam, by:[0,1])
+                                            .combine(splitbam_ch.chr_bam,by:[0,1])
                                             .combine(ref_genome_ch)
                                             .combine(ref_fai_ch)
         whatshap_ch = WHATSHAP(input_whatshap_ch)

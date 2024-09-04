@@ -1,5 +1,5 @@
 process METH_PILEUP {
-    tag "chr${ch}"
+    tag "${name}-chr${ch}"
     publishDir "${workflow.launchDir}/results/pileup_meth/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
     memory '100 GB'

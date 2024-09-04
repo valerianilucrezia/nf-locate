@@ -32,7 +32,7 @@ workflow {
     bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true) 
     
     // chr channel
-    chr_ch = Channel.from(18..22)//Channel.from(20..22)
+    chr_ch = Channel.from(20..22)
 
     //pipeline main
     input_vc_ch = input_all.combine(ref_genome_ch).combine(ref_fai_ch)
