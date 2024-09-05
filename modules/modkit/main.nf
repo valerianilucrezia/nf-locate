@@ -19,7 +19,7 @@ process MODKIT {
 
     script:
     """
-    modkit pileup "${bam}" "${name}_summary.bed" --ignore h --ref "${ref_genome}" --cpg --combine-strands --log-filepath "${name}_pileup_summary.log" -t 24
+    modkit pileup "${bam}" "${name}_summary.bed" --ignore h --ref "${ref_genome}" --cpg --combine-strands --log-filepath "${name}_pileup_summary.log" -t 12
     modkit pileup "${bam}" "${name}_bystrand.bed" --ignore h --ref "${ref_genome}" --log-filepath "${name}_pileup_bystrand.log" -t 12
     """
 }

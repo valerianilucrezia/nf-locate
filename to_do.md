@@ -1,12 +1,13 @@
 ## To do
 ### General
-- [ ] write `main.nf` workflow
+- [x] write `main.nf` workflow
 - [x] add singularity images
 - [ ] need to change `modules/read_vcf/main.nf`to perform the correct tasks (use the corresponding  script on the bin dir)
 - [ ] need to chanche `modules/combine_methylation/main.nf` to perform the correct tasks (use the corresponding  script on the bin dir)
-- [ ] get a *testing dataset*
+- [x] get a *testing dataset*
 - [ ] tune general HPC default parameters
 - [ ] test the pipelines with 2 datasets
+- [ ] see the output names -- for the moment I think that the only problem is 'read_phasing', and maybe 'pileup meth'?
 
 
 ### `variant_calling`

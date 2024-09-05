@@ -31,6 +31,6 @@ args <- commandArgs(trailingOnly = TRUE)
 c <- args[1] # chromosome
 vcf_tumor <-  args[2] 
 vcf_normal <- args[3] 
-output_name <-  paste0("chr",c,"_COLO829")
+output_name <-  paste0("chr",c,"_exp")
 
 get_join_meth(c, vcf_tumor, vcf_normal, output_name)
