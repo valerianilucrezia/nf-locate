@@ -1,14 +1,20 @@
-process READ_BED {
 
-    publishDir params.publish_dir, mode: 'copy'
+process READ_BED {
+    tag "${name}-chr${chr}"
+    publishDir "${workflow.launchDir}/results/read_bed/", mode: 'copy'
+    container 'docker://lvaleriani/long_reads:latest'
+    memory '16 GB'
 
     input:
-   
-  
+        tuple val(chr), val(name), path(bed)
+        
+
     output:
+        tuple val(chr), val(name), path('*.RDS'), emit: 'chr_rds'
 
     script:
-
     """
+        #!/usr/bin/env bash
+        read_bed.R "${chr}" "${bed}" "${name}_chr${chr}" 
     """
 }

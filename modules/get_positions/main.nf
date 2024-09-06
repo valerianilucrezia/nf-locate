@@ -1,14 +1,19 @@
-process GET_POSITIONS {
+#!/usr/bin/env nextflow
 
-    publishDir params.publish_dir, mode: 'copy'
+process GET_POSITIONS {
+    tag "${name}-chr${ch}"
+    publishDir "${workflow.launchDir}/results/get_positions/", mode: 'copy'
+    container 'docker://lvaleriani/long_reads:latest'
+    memory '20 GB'
 
     input:
-   
-  
-  output:
+    tuple val(ch), val(name), path(bed)
+
+    output:
+    tuple val(name), val(ch), path('*_meth'), emit: 'chr_bed'
 
     script:
-
     """
+    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$3}' > "chr${ch}_${name}_meth"
     """
 }
