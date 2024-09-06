@@ -6,7 +6,7 @@ process MODKIT {
     container 'https://depot.galaxyproject.org/singularity/ont-modkit%3A0.3.1--h5c23e0d_1'
     cpus 12
     memory '100 GB'
-    time '12h'
+    time '48h'
 
     
     input:

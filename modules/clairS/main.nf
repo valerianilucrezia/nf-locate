@@ -6,7 +6,7 @@ process CLAIRS {
   container 'docker://hkubal/clairs:latest'
   cpus 1
   memory '200 GB'
-  time '24h'
+  time '48h'
 
   input:
    tuple val(name), path(tumor_bam), path(tumor_bai), path(normal_bam), path(normal_bai), path(ref_genome), path(ref_fai)
