@@ -6,9 +6,12 @@
 - [ ] need to chanche `modules/combine_methylation/main.nf` to perform the correct tasks (use the corresponding  script on the bin dir)
 - [x] get a *testing dataset*
 - [ ] tune general HPC default parameters
-- [ ] test the pipelines with 2 datasets
-- [ ] see the output names -- for the moment I think that the only problem is 'read_phasing', and maybe 'pileup meth'?
+- [ ] test the pipelines with 2 datasets - Multisample
 
+### Lucrezia
+- [ ] Check R scripts
+- [ ] Create params files
+- [ ] Change names to files and directory structure
 
 ### `variant_calling`
 - [x] write `main.nf` of the sub-workflow `subworkflows/variant_calling/main.nf`
