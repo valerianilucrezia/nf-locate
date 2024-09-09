@@ -1,0 +1,86 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "",
+    "title": "nf-locate - params.input schema",
+    "description": "Schema for the file provided with params.input",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sampleID": {
+                "errorMessage": "Sample ID must be provided and cannot contain spaces",
+                "meta": ["sampleID"],
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+$"
+                    },
+                    {
+                        "type": "integer"
+                    }
+                ]
+            },
+            "tumor_alignment": {
+                "errorMessage": "Tumor BAM or CRAM file cannot contain spaces and must have extension '.bam' or '.cram'",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+\\.(bam|cram)$"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ],
+                "format": "file-path",
+                "exists": true
+            },
+            "tumor_alignment_index": {
+                "errorMessage": "Tumor BAI or CRAI index file cannot contain spaces and must have extension '.bai' or '.crai'",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+\\.(bai|crai|csi)$"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ],
+                "format": "file-path",
+                "exists": true
+            },
+            "normal_alignment": {
+                "errorMessage": "Normal BAM or CRAM file cannot contain spaces and must have extension '.bam' or '.cram'",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+\\.(bam|cram)$"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ],
+                "format": "file-path",
+                "exists": true
+            },
+            "normal_alignment_index": {
+                "errorMessage": "Normal BAI or CRAI index file cannot contain spaces and must have extension '.bai' or '.crai'",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+\\.(bai|crai)$"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ],
+                "format": "file-path",
+                "exists": true
+            }
+        },
+        "required": ["sampleID", "tumor_alignment", "tumor_alignment_index"]
+    }
+}

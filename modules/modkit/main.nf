@@ -1,19 +1,19 @@
 #!/usr/bin/env nextflow
 
 process MODKIT {
-    tag "${name}"
+    tag "${meta.sampleID}-chr${meta.chr}"
     container 'https://depot.galaxyproject.org/singularity/ont-modkit%3A0.3.1--h5c23e0d_1'
 
     input:
-      tuple val(name), path(bam), path(bai), path(ref_genome), path(ref_fai) 
+      tuple val(meta), path(bam), path(bai), path(ref_genome), path(ref_fai) 
 
     output:
-      tuple val(name), path('*_summary.bed'), emit: 'bed_summary' 
-      tuple val(name), path('*_bystrand.bed'), emit: 'bed_bystrand' 
-      tuple val(name), path('*.log'), emit: 'log'
+      tuple val(meta), path('*_summary.bed'), emit: 'bed_summary' 
+      tuple val(meta), path('*.log'), emit: 'log'
 
     script:
+
     """
-    modkit pileup "${bam}" "${name}_summary.bed" --ignore h --ref "${ref_genome}" --cpg --combine-strands --log-filepath "${name}_pileup_summary.log" -t 12
+    modkit pileup ${bam} "${meta.sampleID}_chr${meta.chr}_summary.bed" --ignore h --ref ${ref_genome} --cpg --combine-strands --log-filepath "${meta.sampleID}_${meta.chr}_pileup_summary.log" -t 12
     """
 }

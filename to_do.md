@@ -2,16 +2,15 @@
 ### General
 - [x] write `main.nf` workflow
 - [x] add singularity images
-- [ ] need to change `modules/read_vcf/main.nf`to perform the correct tasks (use the corresponding  script on the bin dir)
-- [ ] need to chanche `modules/combine_methylation/main.nf` to perform the correct tasks (use the corresponding  script on the bin dir)
 - [x] get a *testing dataset*
 - [ ] tune general HPC default parameters
 - [ ] test the pipelines with 2 datasets - Multisample
 
 ### Lucrezia
 - [ ] Check R scripts
-- [ ] Create params files
-- [ ] Change names to files and directory structure
+- [ ] Check consistency between path
+- [x] Create params files
+- [x] Change names to files and directory structure
 
 ### `variant_calling`
 - [x] write `main.nf` of the sub-workflow `subworkflows/variant_calling/main.nf`

@@ -1,18 +1,17 @@
 
 process READ_BED {
-    tag "${name}-chr${chr}"
+    tag "${meta.sampleID}-chr${meta.chr}"
     container 'docker://lvaleriani/long_reads:latest'
 
     input:
-        tuple val(chr), val(name), path(bed)
+        tuple val(meta), path(bed)
         
 
     output:
-        tuple val(chr), val(name), path('*.RDS'), emit: 'chr_rds'
+        tuple val(meta), path('*.RDS'), emit: 'rds'
 
     script:
     """
-        #!/usr/bin/env bash
-        read_bed.R "${chr}" "${bed}" "${name}_chr${chr}" 
+    read_bed.R "${meta.chr}" "${bed}" "${meta.sampleID}_chr${meta.chr}" 
     """
 }

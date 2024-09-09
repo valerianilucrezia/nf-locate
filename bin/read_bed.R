@@ -9,7 +9,7 @@ read_meth <- function(data, ch, out) {
     filter(chr == ch) %>%
     separate(N, into = c("cov", "beta", 'mod', 'canon', 'other', 'delete', 'fail', 'diff', 'nocall'), sep = " ")
   
-  saveRDS(f_file, paste0(out, '_chr', ch, '.RDS'))
+  saveRDS(f_file, paste0(out, '.RDS'))
 }
 
 

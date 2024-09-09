@@ -2,50 +2,55 @@
 
 include { MODKIT } from '../../modules/modkit/main'
 include { GET_POSITIONS } from '../../modules/get_positions/main'
-include { METH_PILEUP } from '../../modules/pileup_methylation/main'
+include { METH_PILEUP as METH_PILEUP_T } from '../../modules/pileup_methylation/main'
+include { METH_PILEUP as METH_PILEUP_N } from '../../modules/pileup_methylation/main'
+
 include { READ_BED } from '../../modules/read_bed/main'
 include { COMBINE } from '../../modules/combine_methylation/main'
 
 
 workflow METYLATION {
     take:
-        t_ch 
-        n_ch
-        chr_ch
-        ref_genome_ch
-        ref_fai_ch
-        chr_bam_ch
+        split_tumor 
+        split_normal
+        ref_genome
        
     main:
 
         //modkit
-        t_input_modkit_ch = t_ch.combine(ref_genome_ch).combine(ref_fai_ch)
-        n_input_modkit_ch = n_ch.combine(ref_genome_ch).combine(ref_fai_ch)
-        input_modkit_ch = t_input_modkit_ch.mix(n_input_modkit_ch)
-        modkit_ch = MODKIT(input_modkit_ch)
+        tumor = split_tumor.combine(ref_genome)
+        modkit_T = MODKIT(tumor)
         
         //get positions
-        input_getpositions_ch = chr_ch.combine(modkit_ch.bed_summary)
-        get_positions_ch = GET_POSITIONS(input_getpositions_ch)
+        get_positions = GET_POSITIONS(modkit_T.bed_summary)
 
         //pileup meth
-        input_pilupmet_ch = get_positions_ch.chr_bed.combine(chr_bam_ch, by: [0,1])
-                                                .combine(ref_genome_ch)
-                                                .combine(ref_fai_ch) 
-        pileupmet_ch = METH_PILEUP(input_pilupmet_ch)
+        in_T = split_tumor.join(get_positions).combine(ref_genome)
+        in_N = split_normal.map{ meta, bam, bai ->
+                    [meta.subMap('sampleID', 'chr'), bam, bai]
+                }.join(get_positions.map { meta, bed -> 
+                    [meta.subMap('sampleID', 'chr'), bed]
+                }).map{ meta, bam, bai, bed -> 
+                    meta = meta + [type:'Normal']
+                    [meta, bam, bai, bed]
+                }.combine(ref_genome)
+
+        METH_PILEUP_T(in_T)
+        METH_PILEUP_N(in_N)
         
-        //read bed
-        input_readbed_ch = chr_ch.combine(modkit_ch.bed_summary)    
-        readbed_ch = READ_BED(input_readbed_ch)
+        //read bed 
+        READ_BED(modkit_T.bed_summary)
 
         //combine
-        readbed_rds_ch = readbed_ch.chr_rds
-        chr_vcf_ch = pileupmet_ch.chr_vcf
-        input_combine_ch = readbed_rds_ch.combine(chr_vcf_ch,by:[0,1]).branch {
-                                                                    tumor: it[0] == t_ch.first()
-                                                                    normal: it[0] == n_ch.first() }
-        combine_ch = COMBINE(input_combine_ch.tumor.combine(input_combine_ch.normal, by: 0))
+        combine = METH_PILEUP_T.out.vcf.map { meta, vcf ->
+                [meta.subMap('sampleID', 'chr'), vcf]
+            }.join(METH_PILEUP_N.out.vcf.map { meta, vcf ->
+                [meta.subMap('sampleID', 'chr'), vcf]
+            }).join(READ_BED.out.rds.map {meta, bed ->
+                [meta.subMap('sampleID', 'chr'), bed]
+            })
+        COMBINE(combine)
 
     emit:
-        combine_ch.chr_rds
+        COMBINE.out.rds
 }

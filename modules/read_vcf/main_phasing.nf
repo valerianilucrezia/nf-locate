@@ -1,24 +1,20 @@
 #!/usr/bin/env nextflow
 
 process READ_PHASING {
-    tag "chr${chr}"
+    tag "${meta.sampleID}-chr${meta.chr}"
     container 'docker://lvaleriani/long_reads:latest'
 
 
     input:
-        tuple val(t_name), val(n_name), val(chr), path(t_chr_phased_vcf), path(n_chr_phased_vcf)
+        tuple val(meta), path(vcf_N), path(vcf_T)
 
     output:
-        path '*.RDS', emit: 'chr_rds'
+        tuple val(meta), path('*.RDS'), emit: 'chr_rds'
 
     script:
     """
         #!/usr/bin/env bash
-
-        VCF_TUMOR="${t_chr_phased_vcf}"
-        VCF_NORMAL="${n_chr_phased_vcf}"
-
-        read_phasing.R "${chr}" "\${VCF_TUMOR}" "\${VCF_NORMAL}"  
+        read_phasing.R "${meta.chr}" $vcf_N $vcf_T
 
     """
 }

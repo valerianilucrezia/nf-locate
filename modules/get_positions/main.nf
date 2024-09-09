@@ -1,17 +1,19 @@
 #!/usr/bin/env nextflow
 
 process GET_POSITIONS {
-    tag "${name}-chr${ch}"
+    tag "${meta.sampleID}-chr${meta.chr}"
     container 'docker://lvaleriani/long_reads:latest'
 
     input:
-    tuple val(ch), val(name), path(bed)
+    tuple val(meta), path(bed)
 
     output:
-    tuple val(name), val(ch), path('*_meth'), emit: 'chr_bed'
+    tuple val(meta), path('*_meth'), emit: 'bed'
 
     script:
+
     """
-    cat "${bed}" | grep -w "chr${ch}" | grep -v "random" | awk '{print \$1, \$3}' > "chr${ch}_${name}_meth"
+    #change to cat
+    head -n 100 "${bed}" | grep -w "chr${meta.chr}" | grep -v "random" | awk '{print \$1, \$3}' > "chr${meta.chr}_${meta.sampleID}_meth"
     """
 }

@@ -19,7 +19,7 @@ get_join_meth <- function(c, vcf_tumor, vcf_normal, output_name) {
   #N_join <- inner_join(fix, gt)
 
   #join <- full_join(T_join, N_join, by = join_by(id, suffix = c("_T", "_N")))  
-  saveRDS(object = T_vcf, file = paste0(output_name, '_join_meth.RDS'))
+  saveRDS(object = T_vcf, file = paste0(output_name, '_join_cn.RDS'))
 }
 
 
@@ -31,6 +31,6 @@ args <- commandArgs(trailingOnly = TRUE)
 c <- args[1] # chromosome
 vcf_tumor <-  args[2] 
 vcf_normal <- args[3] 
-output_name <-  paste0("chr",c,"_exp")
+output_name <-  paste0("chr",c)
 
 get_join_meth(c, vcf_tumor, vcf_normal, output_name)
