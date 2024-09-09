@@ -7,31 +7,28 @@ include { READ_PHASING } from '../../modules/read_vcf/main_phasing'
 
 workflow PILEUP {
     take:
-        t_ch 
-        n_ch
-        chr_ch
-        bed_ch
-        ref_genome_ch
-        ref_fai_ch
+        tumor 
+        normal
+        chromosome
+        bed
+        ref_genome
     
     main:
     // split bam
-        t_input_splitbam_ch = chr_ch.combine(t_ch) 
-        n_input_splitbam_ch = chr_ch.combine(n_ch) 
+        t_input_splitbam_ch = chr_ch.combine(tumor) 
+        n_input_splitbam_ch = chr_ch.combine(normal) 
         input_splitbam_ch = t_input_splitbam_ch.mix(n_input_splitbam_ch)
         splitbam_ch = SPLIT_BAM(input_splitbam_ch)
     
     // pileup
         input_pileupcn_ch = splitbam_ch.chr_bam
-                                            .combine(bed_ch)
-                                            .combine(ref_genome_ch)
-                                            .combine(ref_fai_ch)
+                                            .combine(bed)
+                                            .combine(ref_genome)
         pileupcn_ch = PILEUP_CN(input_pileupcn_ch)
     
         input_whatshap_ch = pileupcn_ch.chr_vcf
                                             .combine(splitbam_ch.chr_bam,by:[0,1])
-                                            .combine(ref_genome_ch)
-                                            .combine(ref_fai_ch)
+                                            .combine(ref_genome)
         whatshap_ch = WHATSHAP(input_whatshap_ch)
 
     // phasing

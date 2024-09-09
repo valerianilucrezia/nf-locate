@@ -1,0 +1,2 @@
+sample,tumor_bam,tumor_bai,normal_bam,normal_bai
+PDO_6,/orfeo/LTS/CDSLab/LT_storage/ORID0077_Scolorina/PDO6/20240717_1531_2B_PAW70774_f5c78363/run_5mCG_5hmCG/PDO6_5mCG_5hmCG_sorted.bam,/orfeo/LTS/CDSLab/LT_storage/ORID0077_Scolorina/PDO6/20240717_1531_2B_PAW70774_f5c78363/run_5mCG_5hmCG/PDO6_5mCG_5hmCG_sorted.bam.csi,/orfeo/LTS/LADE/LT_storage/lvaleriani/scolorina_analysis/short_read_data/bam/all_bam_normal/6_A.recal.bam,/orfeo/LTS/LADE/LT_storage/lvaleriani/scolorina_analysis/short_read_data/bam/all_bam_normal/6_A.recal.bam.bai

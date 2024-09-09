@@ -1,0 +1,19 @@
+nextflow.enable.dsl=2
+cleanup=false
+
+
+env {
+     SINGULARITY_TMPDIR="/orfeo/LTS/LADE/LT_storage/lvaleriani/tmp"
+}
+
+process {
+    executor='slurm'
+    queue='EPYC'
+}
+
+
+singularity {
+    singularity.envWhitelist = ["SINGULARITY_TMPDIR"]
+    singularity.runOptions = '--bind /orfeo:/orfeo --bind $SINGULARITY_TMPDIR:/tmp'
+    singularity.cacheDir = ["NXF_SINGULARITY_CACHEDIR"]
+}

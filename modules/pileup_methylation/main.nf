@@ -1,10 +1,6 @@
 process METH_PILEUP {
     tag "${name}-chr${ch}"
-    publishDir "${workflow.launchDir}/results/pileup_meth/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
-    memory '100 GB'
-    cpus 12
-    time '24h'
 
     input:
     tuple val(name), val(ch), path(chr_bed), path(chr_bam), path(chr_bai), path(ref), path(fai)

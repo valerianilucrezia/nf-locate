@@ -2,11 +2,7 @@
 
 process WHATSHAP {
     tag "${name}-chr${ch}"
-    publishDir "${workflow.launchDir}/results/whatshap/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/whatshap%3A2.3--py39h1f90b4d_0'
-    memory '200 GB'
-    time '12h'
-    cpus 12
 
     input:
         tuple val(name), val(ch), path(chr_vcf), path(chr_bam), path(chr_bai), path(ref), path(ref_fai)

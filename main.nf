@@ -1,43 +1,44 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include { METYLATION } from "${baseDir}/subworkflows/methylation/main"
-include { PILEUP } from "${baseDir}/subworkflows/pileup/main"
 include { VARIANT_CALLING } from "${baseDir}/subworkflows/variant_calling/main"
+//include { METYLATION } from "${baseDir}/subworkflows/methylation/main"
+//include { PILEUP } from "${baseDir}/subworkflows/pileup/main"
 //include { SMOOTHING } from "${baseDir}/subworkflows/smoothing/main"
 
 
 workflow {  
     //samplesheet
-    input_tumor = Channel.fromPath(params.samplesheet).
+    input_tumor = Channel.fromPath(params.input).
       splitCsv(header: true).
       map{row ->
-        tuple("t_"+ row.sample.toString(), file(row.tumor_bam), file(row.tumor_bam + '.bai'))}
+        tuple(row.sample.toString(), "T_"+ row.sample.toString(), file(row.tumor_bam), file(row.tumor_bai))}
 
-    input_normal = Channel.fromPath(params.samplesheet).
+    input_normal = Channel.fromPath(params.input).
       splitCsv(header: true).
       map{row ->
-        tuple("n_"+ row.sample.toString(), file(row.normal_bam), file(row.normal_bam + '.bai'))}
+        tuple(row.sample.toString(), "N_"+ row.sample.toString(), file(row.normal_bam), file(row.normal_bai))}
 
-    input_all = Channel.fromPath(params.samplesheet).
+    input_matched = Channel.fromPath(params.input).
       splitCsv(header: true).
       map{row ->
-        tuple(row.sample.toString(), file(row.tumor_bam), file(row.tumor_bam + '.bai'), file(row.normal_bam), file(row.normal_bam + '.bai'))}
+        tuple(row.sample.toString(), file(row.tumor_bam), file(row.tumor_bai), file(row.normal_bam), file(row.normal_bai))}
     
     //reference genome
     ref_genome_ch = Channel.fromPath(params.ref_genome, checkIfExists: true) 
     ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
+    ref_genome = ref_genome_ch.combine(ref_fai_ch)
 
-    //bed channel
+    // bed channel
     bed_ch = Channel.fromPath(params.bed_data, checkIfExists: true) 
     
     // chr channel
     chr_ch = Channel.from(20..22)
 
+
     //pipeline main
-    input_vc_ch = input_all.combine(ref_genome_ch).combine(ref_fai_ch)
-    VARIANT_CALLING(input_vc_ch)
-    chr_bam_pileup = PILEUP(input_tumor, input_normal, chr_ch, bed_ch, ref_genome_ch, ref_fai_ch)
-    METYLATION(input_tumor, input_normal, chr_ch, ref_genome_ch, ref_fai_ch, chr_bam_pileup)
+    VARIANT_CALLING(input_matched, ref_genome)
+    //chr_bam_pileup = PILEUP(input_tumor, input_normal, chr_ch, bed_ch, ref_genome)
+    //METYLATION(input_tumor, input_normal, chr_ch, ref_genome, ref_fai_ch, chr_bam_pileup)
 }
 

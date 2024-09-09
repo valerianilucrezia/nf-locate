@@ -5,16 +5,18 @@ include { READ_SOMATIC } from '../../modules/read_vcf/main_somatic.nf'
 
 workflow VARIANT_CALLING {
     take:
-        sample_ch
+        bam
+        reference
         
     main:
-        clairs_ch = CLAIRS(sample_ch)
-        vcf_ch = clairs_ch.vcf.flatten().first()
-                                        .combine(clairs_ch.vcf.flatten().filter{ file -> file.toString().contains('.vcf') })
-        read_somatic_ch = READ_SOMATIC(vcf_ch)
+
+        clairs = CLAIRS(bam, reference)
+        clairs.view()
+        vcf = clairs.vcf.flatten().first().combine(clairs.vcf.flatten().filter{ file -> file.toString().contains('.vcf') })
+        results = READ_SOMATIC(vcf)
 
     emit:
-        read_somatic_ch.rds
+        results.rds
         
 }
 

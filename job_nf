@@ -1,7 +1,7 @@
 #!/bin/sh
 #### Cluster specific arguments ####
 
-#SBATCH --job-name=nf_lr_master
+#SBATCH --job-name=ONT_NF_master
 #SBATCH --error=err
 #SBATCH --partition=THIN
 #SBATCH --nodes=1
@@ -13,13 +13,13 @@
 #SBATCH --output=log
 
 module load singularity/3.10.4
-module load java/1.8.0
+module load java
 
-lr_dna=/orfeo/LTS/LADE/LT_storage/lvaleriani/LR_Pipeline_DNA
-RESULTS_PATH=$lr_data/results/
 
-/orfeo/LTS/LADE/LT_storage/lvaleriani/nextflow/nextflow run $lr_dna/main.nf \
+pipeline=/orfeo/LTS/LADE/LT_storage/lvaleriani/LR_Pipeline_DNA
+/orfeo/LTS/LADE/LT_storage/lvaleriani/nextflow/nextflow run $pipeline/main.nf \
     -resume \
-    -c $lr_dna/modules/config/config \
-    --samples $lr_dna/input.csv \
-    --publish_dir $RESULTS_PATH 
+    -c $pipeline/myconfig \
+    --input $pipeline/organoids.csv \
+    --outdir $pipeline/res_organoids \
+    -profile singularity

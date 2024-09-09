@@ -2,10 +2,8 @@
 
 process SPLIT_BAM {
   tag "${name}-chr${ch}"
-  publishDir "${workflow.launchDir}/results/split_bam/", mode: 'copy'
   container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
-  memory '200 GB'
-  time '10h'
+
 
   input:
     tuple val(ch), val(name), path(sample_bam), path(sample_bai)

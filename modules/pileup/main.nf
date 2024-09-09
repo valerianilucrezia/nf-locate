@@ -2,11 +2,7 @@
 
 process PILEUP_CN {
     tag "${name}-chr${ch}"
-    publishDir "${workflow.launchDir}/results/pileup_cn/", mode: 'copy'
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
-    memory '200 GB'
-    time '12h'
-    cpus 12
 
     input:
       tuple val(name), val(ch), path(chr_bam), path(chr_bai), path(sample_bed), path(ref), path(ref_fai)

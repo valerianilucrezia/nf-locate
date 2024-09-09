@@ -1,9 +1,7 @@
 
 process READ_BED {
     tag "${name}-chr${chr}"
-    publishDir "${workflow.launchDir}/results/read_bed/", mode: 'copy'
     container 'docker://lvaleriani/long_reads:latest'
-    memory '16 GB'
 
     input:
         tuple val(chr), val(name), path(bed)
