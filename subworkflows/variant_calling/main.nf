@@ -11,8 +11,8 @@ workflow VARIANT_CALLING {
     main:
 
         clairs = CLAIRS(bam, reference)
-        vcf = clairs.vcf.flatten().first().combine(clairs.vcf.flatten().filter{ file -> file.toString().contains('.vcf') })
-        results = READ_SOMATIC(vcf)
+        results = READ_SOMATIC(clairs.somatic)
+        
 
     emit:
         results.rds

@@ -4,7 +4,6 @@ include { MODKIT } from '../../modules/modkit/main'
 include { GET_POSITIONS } from '../../modules/get_positions/main'
 include { METH_PILEUP as METH_PILEUP_T } from '../../modules/pileup_methylation/main'
 include { METH_PILEUP as METH_PILEUP_N } from '../../modules/pileup_methylation/main'
-
 include { READ_BED } from '../../modules/read_bed/main'
 include { COMBINE } from '../../modules/combine_methylation/main'
 
@@ -22,7 +21,7 @@ workflow METYLATION {
         modkit_T = MODKIT(tumor)
         
         //get positions
-        get_positions = GET_POSITIONS(modkit_T.bed_summary)
+        get_positions = GET_POSITIONS(modkit_T.bed)
 
         //pileup meth
         in_T = split_tumor.join(get_positions).combine(ref_genome)

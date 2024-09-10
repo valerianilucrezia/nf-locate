@@ -4,7 +4,7 @@ library(vcfR)
 
 args <- commandArgs(trailingOnly = TRUE)
 file <- args[1]         # vcf file
-res_dir <- args[2]      # output dir
+#res_dir <- args[2]      # samplename
 
 vcf <- vcfR::read.vcfR(file)
 vcf <- vcfR::vcfR2tidy(vcf)
@@ -13,5 +13,5 @@ gt <- vcf$gt %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(
 vaf <- full_join(fix, gt)
 
 base_name <- sub('\\.vcf.gz*$', '', basename(file))
-output_file <- paste0(res_dir, base_name, '_vaf.RDS')
+output_file <- paste0(base_name, '_vaf.RDS')
 saveRDS(object = vaf, file = output_file)

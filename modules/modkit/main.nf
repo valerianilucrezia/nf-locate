@@ -8,12 +8,18 @@ process MODKIT {
       tuple val(meta), path(bam), path(bai), path(ref_genome), path(ref_fai) 
 
     output:
-      tuple val(meta), path('*_summary.bed'), emit: 'bed_summary' 
+      tuple val(meta), path('*.bed'), emit: 'bed' 
       tuple val(meta), path('*.log'), emit: 'log'
 
     script:
 
     """
-    modkit pileup ${bam} "${meta.sampleID}_chr${meta.chr}_summary.bed" --ignore h --ref ${ref_genome} --cpg --combine-strands --log-filepath "${meta.sampleID}_${meta.chr}_pileup_summary.log" -t 12
+    modkit pileup ${bam} "${meta.sampleID}_chr${meta.chr}_summary.bed" \
+      --ref ${ref_genome} \
+      --ignore h \
+      --cpg \
+      --combine-strands \
+      --log-filepath "${meta.sampleID}_${meta.chr}_pileup_summary.log" \
+      -t 12
     """
 }

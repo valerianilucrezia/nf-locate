@@ -1,19 +1,18 @@
 #!/usr/bin/env nextflow
 
 process READ_SOMATIC {
-    tag "${name}"
+    tag "${meta.sampleID}"
     container 'docker://lvaleriani/long_reads:latest'
     memory '16 GB'
 
     input:
-        tuple val(name), path(vcf_file)
+        tuple val(meta), path(vcf), path(tbi)
         
     output:
-        tuple val(name), path('*.RDS'), emit: 'rds'
+        tuple val(meta), path('*.RDS'), emit: 'rds'
 
     script:
     """
-        #!/usr/bin/env bash
-        read_vcf_somatic.R "${vcf_file}" "" 
+    read_vcf_somatic.R "${vcf}"
     """
 }
