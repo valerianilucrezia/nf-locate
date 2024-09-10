@@ -12,7 +12,8 @@ The pipeline is composed by 3 parallel workflows:
 - `methylation_calling`
 - `pileup`
 
-<img width="958" alt="Screenshot 2024-07-08 alle 15 58 52" src="https://github.com/valerianilucrezia/LR_Pipeline_DNA/assets/72545549/04d31099-6b46-4df9-b404-ff0bb555ec14">
+<img width="863" alt="Screenshot 2024-09-10 alle 16 51 49" src="https://github.com/user-attachments/assets/714b6b90-61ea-4dd7-ba7a-8bcdbab70686">
+
 
 # How to run the pipeline
 ### Samplesheet
