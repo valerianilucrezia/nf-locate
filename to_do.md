@@ -11,3 +11,4 @@
   - [ ] Matched Nanopore
 - [ ] Update workflow
 - [ ] Update README
+- [ ] Add params to bash scripts
