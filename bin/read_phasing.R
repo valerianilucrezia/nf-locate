@@ -1,36 +1,47 @@
 #!/usr/bin/env Rscript
 library(dplyr)
 library(vcfR)
+library(tidyverse)
 
-get_join_meth <- function(c, vcf_tumor, vcf_normal, output_name) {
-  T_vcf <- vcfR::read.vcfR(vcf_tumor)
-  T_vcf <- vcfR::vcfR2tidy(T_vcf)
-  #fix <- T_vcf$fix %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, CHROM, POS, REF, ALT, FILTER)
-  #gt <- T_vcf$gt %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, gt_DP, gt_AF, gt_AD) ---- old
-  #gt <- T_vcf$gt %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, gt_DP)
-  #T_join <- inner_join(fix, gt)
-
-    
-  #N_vcf <- vcfR::read.vcfR(vcf_normal)
-  #N_vcf <- vcfR::vcfR2tidy(N_vcf)
-  #fix <- N_vcf$fix %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, CHROM, POS, REF, ALT, FILTER)
-  # gt <- N_vcf$gt %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, gt_DP, gt_AF, gt_AD) ---- old
-  #gt <- N_vcf$gt %>% dplyr::mutate(id = paste(ChromKey, POS, sep = ':')) %>% select(id, gt_DP)
-  #N_join <- inner_join(fix, gt)
-
-  #join <- full_join(T_join, N_join, by = join_by(id, suffix = c("_T", "_N")))  
-  saveRDS(object = T_vcf, file = paste0(output_name, '_join_cn.RDS'))
+read_vcf <- function(filename) {
+  vcf <- vcfR::read.vcfR(filename)
+  vcf <- vcfR::vcfR2tidy(vcf)
+  fix <- vcf$fix %>% filter(INDEL == 'FALSE') %>% select(ChromKey, CHROM, POS, REF, ALT)
+  gt <- vcf$gt %>% select(ChromKey, POS, gt_DP, gt_AD, gt_GT, gt_PS)
+  join <- inner_join(fix, gt, by = join_by(ChromKey, POS)) %>% 
+       tidyr::separate(gt_AD, into = c('R_AD', 'A_AD'), sep = ',', remove = T, convert = T) %>%
+       dplyr::mutate(BAF = A_AD/gt_DP) %>%
+       dplyr::select(-ChromKey) %>%
+       dplyr::filter(gt_GT != "1/2", !is.na(gt_GT))
+  return(join)
 }
 
-
-######################################################
-### Processing a single chromosome
-######################################################
-
 args <- commandArgs(trailingOnly = TRUE)
-c <- args[1] # chromosome
+c <- args[1] #chromosome
 vcf_tumor <-  args[2] 
 vcf_normal <- args[3] 
-output_name <-  paste0("chr",c)
+output_name <-  args[3] #sample name
 
-get_join_meth(c, vcf_tumor, vcf_normal, output_name)
+vcf_T <- read_vcf(vcf_tumor)
+vcf_N <- read_vcf(vcf_normal)
+
+T_mean_cov <- mean(vcf_T$gt_DP)
+T_median_cov <- median(vcf_T$gt_DP)
+
+N_mean_cov <- mean(vcf_N$gt_DP)
+N_median_cov <- median(vcf_N$gt_DP)
+
+corr_mean <- N_mean_cov / T_mean_cov
+corr_median <- N_median_cov / T_median_cov
+
+vcf_join <- inner_join(vcf_N, vcf_T, by = join_by(CHROM,POS), suffix = c('_N', '_T')) %>%
+  dplyr::mutate(DR = gt_DP_T / gt_DP_N) %>%
+  dplyr::mutate(mean_DR = DR * corr_mean,
+                median_DR = DR * corr_median) %>%
+  dplyr::mutate(mirr_BAF = ifelse(BAF_T > 0.5, 1-BAF_T, BAF_T)) %>%
+  dplyr::arrange(POS) %>%
+  dplyr::mutate(pos = seq(1, n()))
+
+saveRDS(object=vcf_join, file=paste0(output_name, '_chr', c, '.RDS'))
+
+
