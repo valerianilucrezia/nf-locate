@@ -14,7 +14,7 @@ process READ_PHASING {
     script:
     """
         #!/usr/bin/env bash
-        read_phasing.R "${meta.chr}" $vcf_N $vcf_T
+        read_phasing.R "${meta.chr}" $vcf_N $vcf_T "${meta.sampleID}"
 
     """
 }

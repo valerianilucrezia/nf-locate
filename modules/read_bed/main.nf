@@ -12,6 +12,6 @@ process READ_BED {
 
     script:
     """
-    read_bed.R "${meta.chr}" "${bed}" "${meta.sampleID}_chr${meta.chr}" 
+    read_bed.R "${bed}" 
     """
 }
