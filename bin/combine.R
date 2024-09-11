@@ -44,8 +44,8 @@ args <- commandArgs(trailingOnly = TRUE)
 chr <- args[1] # chromosome
 T_vcf <- args[2] # Tumor .vcf
 N_vcf <- args[3] # Normal .vcf
-T_rds <- args[5] # Tumor .RDS
-sample <- args[4] # Sample Name
+T_rds <- args[4] # Tumor .RDS
+sample <- args[5] # Sample Name
 
 get_meth(chr, T_rds, T_vcf, N_vcf, sample)
 

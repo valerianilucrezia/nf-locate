@@ -38,7 +38,7 @@ workflow METYLATION {
         METH_PILEUP_N(in_N)
         
         //read bed 
-        READ_BED(modkit_T.bed_summary)
+        READ_BED(modkit_T.bed)
 
         //combine
         combine = METH_PILEUP_T.out.vcf.map { meta, vcf ->

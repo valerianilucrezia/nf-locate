@@ -45,7 +45,7 @@ workflow {
     }
         
     VARIANT_CALLING(input, ref_genome)
-    //PILEUP(splitbam_T, splitbam_N, bed, ref_genome)
-    //METYLATION(splitbam_T, splitbam_N, ref_genome)
+    PILEUP(splitbam_T, splitbam_N, bed, ref_genome)
+    METYLATION(splitbam_T, splitbam_N, ref_genome)
 }
 
