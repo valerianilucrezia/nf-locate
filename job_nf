@@ -2,7 +2,6 @@
 #### Cluster specific arguments ####
 
 #SBATCH --job-name=ONT_NF_master
-#SBATCH --error=err
 #SBATCH --partition=EPYC
 #SBATCH --nodes=1
 #SBATCH --ntasks=2
@@ -14,7 +13,6 @@
 
 module load singularity/3.10.4
 module load java
-
 
 pipeline=/orfeo/LTS/LADE/LT_storage/lvaleriani/LR_Pipeline_DNA
 /orfeo/LTS/LADE/LT_storage/lvaleriani/nextflow/nextflow run $pipeline/main.nf \

@@ -3,3 +3,7 @@
 .Rhistory
 **.DS_Store
 **._*
+organoids.csv
+work/*
+res_*
+.nextflow
