@@ -14,12 +14,14 @@ process MODKIT {
     script:
 
     """
-    modkit pileup ${bam} "${meta.sampleID}_chr${meta.chr}_summary.bed" \
+
+    modkit pileup ${bam} "${meta.sampleID}_chr${meta.chr}_methylation.bed" \
       --ref ${ref_genome} \
       --ignore h \
       --cpg \
       --combine-strands \
-      --log-filepath "${meta.sampleID}_${meta.chr}_pileup_summary.log" \
+      --log-filepath "${meta.sampleID}_${meta.chr}_methylation.log" \
       -t 12
+      
     """
 }

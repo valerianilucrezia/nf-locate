@@ -1,14 +1,13 @@
 ## To do
 ### General
 - [ ] Tune general HPC default parameters
-- [ ] Test the pipelines with 2 datasets - Multisample
-
-### Lucrezia
+- [X] Test the pipelines with 2 datasets - Multisample
 - [ ] Check R scripts
-- [ ] Check consistency between path
-- [ ] Implement the 2 missing setting:
+- [X] Check consistency between path
+- [ ] Implement the 2 missing setting: maybe
   - [ ] Tumor only
   - [ ] Matched Nanopore
-- [ ] Update workflow
-- [ ] Update README
+- [X] Update workflow
+- [X] Update README
 - [ ] Add params to bash scripts
+- [ ] Deal with cram in split_align

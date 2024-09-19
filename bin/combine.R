@@ -32,8 +32,7 @@ get_meth <- function(chr, mT, vcfT, vcfN, sample){
   
   T_join <- full_join(meth_tumor, vcf_tumor, by = join_by(CHROM, POS))
   join <- inner_join(T_join, vcf_normal, by = join_by(CHROM, POS), suffix= c('_T', '_N')) 
-  
-  saveRDS(object = join, file = paste0(sample, '_meth_', chr, '.RDS'))
+  saveRDS(object = join, file = paste0(sample, '_chr', chr, '_methylation_join.RDS'))
 }
 
 

@@ -5,13 +5,16 @@ process READ_SOMATIC {
     container 'docker://lvaleriani/long_reads:latest'
 
     input:
-        tuple val(meta), path(vcf), path(tbi)
+    tuple val(meta), path(vcf), path(tbi)
         
     output:
-        tuple val(meta), path('*.RDS'), emit: 'rds'
+    tuple val(meta), path('*.RDS'), emit: 'rds'
 
     script:
     """
+
+    #!/usr/bin/env bash
     read_vcf_somatic.R "${vcf}"
+
     """
 }

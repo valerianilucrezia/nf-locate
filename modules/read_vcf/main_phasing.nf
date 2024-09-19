@@ -6,15 +6,16 @@ process READ_PHASING {
 
 
     input:
-        tuple val(meta), path(vcf_N), path(vcf_T)
+    tuple val(meta), path(vcf_N), path(vcf_T)
 
     output:
-        tuple val(meta), path('*.RDS'), emit: 'chr_rds'
+    tuple val(meta), path('*.RDS'), emit: 'chr_rds'
 
     script:
     """
-        #!/usr/bin/env bash
-        read_phasing.R "${meta.chr}" $vcf_N $vcf_T "${meta.sampleID}"
+
+    #!/usr/bin/env bash
+    read_phasing.R "${meta.chr}" $vcf_N $vcf_T "${meta.sampleID}"
 
     """
 }

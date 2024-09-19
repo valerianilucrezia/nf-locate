@@ -1,6 +1,5 @@
 #!/usr/bin/env nextflow
 
-include { SPLIT_BAM } from '../../modules/split_bam/main'
 include { PILEUP_CN as PILEUP_CN_T } from '../../modules/pileup/main'
 include { PILEUP_CN as PILEUP_CN_N } from '../../modules/pileup/main'
 include { WHATSHAP as WHATSHAP_T } from '../../modules/whatshap/main'

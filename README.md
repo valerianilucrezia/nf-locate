@@ -36,15 +36,15 @@ s1,s1.bam,s1.bam.bai
 
 | Column    | Description                                                                                                                                                                                                                                                                                                                       |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sampleID` |  <br /> _Required_                                                                                      |
-| `tumor_alignment` |  <br /> _Required_                                                                                                                                |
-| `tumor_alignment_index`  |  <br /> _Required_                                              |
-| `normal_alignment`  |                                                                                                     |
-| `normal_alignment_index`  |                                                                                   |                                           |
+| `sampleID` |  name of the tumor sample <br /> _Required_                                                                                      |
+| `tumor_alignment` | .bam or .cram of tumor sample <br /> _Required_                                                                                                                                |
+| `tumor_alignment_index`  |  .bai or .crai of tumor sample <br /> _Required_                                              |
+| `normal_alignment`  |     .bam or .cram of normal sample            <br /> _Optional_                                                                                                                                |
+| `normal_alignment_index`  |        .bai or .crai of normal sample <br /> _Optional_                                                                                                                                      |                                           |
 
 
 ### Parameters
 - `ref_genome`
 - `ref_fai`
-- `bed_data`
+- `bed_file`
 

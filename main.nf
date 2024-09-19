@@ -2,11 +2,10 @@
 nextflow.enable.dsl=2
 
 include { VARIANT_CALLING } from "${baseDir}/subworkflows/variant_calling/main"
-include { SPLIT_BAM as SPLIT_BAM_N } from "${baseDir}/modules/split_bam/main"
-include { SPLIT_BAM as SPLIT_BAM_T } from "${baseDir}/modules/split_bam/main"
+include { SPLIT_ALIGN as SPLIT_ALIGN_N } from "${baseDir}/modules/split_align/main"
+include { SPLIT_ALIGN as SPLIT_ALIGN_T } from "${baseDir}/modules/split_align/main"
 include { PILEUP } from "${baseDir}/subworkflows/pileup/main"
-include { METYLATION } from "${baseDir}/subworkflows/methylation/main"
-//include { SMOOTHING } from "${baseDir}/subworkflows/smoothing/main"
+include { METYLATION_CALLING } from "${baseDir}/subworkflows/methylation_calling/main"
 
 include { samplesheetToList } from 'plugin/nf-schema'
 
@@ -27,25 +26,25 @@ workflow {
     ref_genome = ref_genome_ch.combine(ref_fai_ch)
 
     // bed channel
-    bed = Channel.fromPath(params.bed_data, checkIfExists: true) 
+    bed = Channel.fromPath(params.bed_file, checkIfExists: true) 
     
     // chr channel
     chromosome = Channel.from(21..22)
 
-    //pipeline main
+    // pipeline main
     // split_bam
-    splitbam_T = SPLIT_BAM_N(chromosome.combine(input_T)).map {ch, meta, bam, bai -> 
+    split_T = SPLIT_ALIGN_T(chromosome.combine(input_T)).map {ch, meta, bam, bai -> 
                 meta = meta + [chr:ch]
                 [meta, bam, bai]
     }
 
-    splitbam_N = SPLIT_BAM_T(chromosome.combine(input_N)).map {ch, meta, bam, bai -> 
+    split_N = SPLIT_ALIGN_N(chromosome.combine(input_N)).map {ch, meta, bam, bai -> 
                 meta = meta + [chr:ch]
                 [meta, bam, bai]
     }
         
     VARIANT_CALLING(input, ref_genome)
-    PILEUP(splitbam_T, splitbam_N, bed, ref_genome)
-    METYLATION(splitbam_T, splitbam_N, ref_genome)
+    PILEUP(split_T, split_N, bed, ref_genome)
+    METYLATION_CALLING(split_T, split_N, ref_genome)
 }
 

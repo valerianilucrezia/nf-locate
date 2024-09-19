@@ -8,12 +8,13 @@ process GET_POSITIONS {
     tuple val(meta), path(bed)
 
     output:
-    tuple val(meta), path('*_meth'), emit: 'bed'
+    tuple val(meta), path('*_position'), emit: 'bed'
 
     script:
-
     """
+
     #change to cat
-    head -n 100 "${bed}" | grep -w "chr${meta.chr}" | grep -v "random" | awk '{print \$1, \$3}' > "chr${meta.chr}_${meta.sampleID}_meth"
+    head -n 100 "${bed}" | grep -w "chr${meta.chr}" | grep -v "random" | awk '{print \$1, \$3}' > "${meta.sampleID}_chr${meta.chr}_methylation_position"
+    
     """
 }

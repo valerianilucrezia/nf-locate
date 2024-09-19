@@ -42,6 +42,6 @@ vcf_join <- inner_join(vcf_N, vcf_T, by = join_by(CHROM,POS), suffix = c('_N', '
   dplyr::arrange(POS) %>%
   dplyr::mutate(pos = seq(1, n()))
 
-saveRDS(object=vcf_join, file=paste0(output_name, '_chr', c, '.RDS'))
+saveRDS(object=vcf_join, file=paste0(output_name, '_phasing.RDS'))
 
 

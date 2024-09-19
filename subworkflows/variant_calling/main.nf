@@ -6,16 +6,16 @@ include { READ_SOMATIC } from '../../modules/read_vcf/main_somatic.nf'
 workflow VARIANT_CALLING {
     take:
         bam
-        reference
+        ref_genome
         
     main:
 
-        clairs = CLAIRS(bam, reference)
+        clairs = CLAIRS(bam, ref_genome)
         results = READ_SOMATIC(clairs.somatic)
         
 
     emit:
-        results.rds
+        results
         
 }
 
