@@ -3,7 +3,7 @@ cleanup=false
 
 
 env {
-     SINGULARITY_TMPDIR="/orfeo/LTS/LADE/LT_storage/lvaleriani/tmp"
+     SINGULARITY_TMPDIR="/orfeo/scratch/area/lvaleriani/tmp"
 }
 
 process {

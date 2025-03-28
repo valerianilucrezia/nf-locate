@@ -14,10 +14,10 @@
 module load singularity/3.10.4
 module load java
 
-pipeline=/orfeo/LTS/LADE/LT_storage/lvaleriani/LR_Pipeline_DNA
-/orfeo/LTS/LADE/LT_storage/lvaleriani/nextflow/nextflow run $pipeline/main.nf \
+pipeline=/orfeo/scratch/area/lvaleriani/nf-locate
+/orfeo/scratch/area/lvaleriani/nextflow run $pipeline/main.nf \
     -resume \
     -c $pipeline/myconfig \
-    --input $pipeline/organoids.csv \
-    --outdir $pipeline/res_organoids \
+    --input $pipeline/input.csv \
+    --outdir $pipeline/results \
     -profile singularity

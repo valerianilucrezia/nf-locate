@@ -7,3 +7,4 @@ organoids.csv
 work/*
 res_*
 .nextflow
+results/

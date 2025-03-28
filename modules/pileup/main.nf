@@ -19,9 +19,10 @@ process PILEUP_CN {
     OUTPUT_VCF="${meta.sampleID}_${meta.type}_chr${meta.chr}_pileup.vcf"
 
     bcftools mpileup -Ou \${INPUT_BAM} -R \${INPUT_BED} -f ${ref_genome} \
+      --skip-indels \
+      --config ont \
       --annotate FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP,INFO/AD,INFO/ADF,INFO/ADR \
-      -Q 0 \
-      --threads 12 | bcftools call -Ov -m --threads 12 -o \${OUTPUT_VCF}
+      --threads 12 | bcftools call -Ov -m -P 0.1 --threads 12 -o \${OUTPUT_VCF}
       
     """
 }

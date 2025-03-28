@@ -1,39 +1,37 @@
 #!/usr/bin/env nextflow
 
-include { PILEUP_CN as PILEUP_CN_T } from '../../modules/pileup/main'
-include { PILEUP_CN as PILEUP_CN_N } from '../../modules/pileup/main'
-include { WHATSHAP as WHATSHAP_T } from '../../modules/whatshap/main'
-include { WHATSHAP as WHATSHAP_N } from '../../modules/whatshap/main'
-include { READ_PHASING } from '../../modules/read_vcf/main_phasing'
+include { PILEUP_CN } from '../../modules/pileup/main'
+include { WHATSHAP } from '../../modules/whatshap/main'
+include { LONGPHASE } from '../../subworkflows/longphase/main'
+include { SHAPEIT4 } from '../../modules/shapeit4/main'
+include {BCFTOOLS_INDEX } from '../../modules/bcftools_index/main'
 
 workflow PILEUP {
     take:
-        split_tumor 
-        split_normal
+        split_bam 
         bed
         ref_genome
+        bam
     
     main:
-
         // pileup
-        pileup_T = PILEUP_CN_T(split_tumor.combine(bed).combine(ref_genome))
-        pileup_N = PILEUP_CN_N(split_normal.combine(bed).combine(ref_genome))
+        pileup = PILEUP_CN(split_bam.combine(bed).combine(ref_genome))
 
-        // phasing
-        whatshap_T = WHATSHAP_T(pileup_T.combine(ref_genome)).map {meta, vcf -> 
-                [meta.subMap('sampleID', 'chr'), vcf]
-        }
-        whatshap_N = WHATSHAP_N(pileup_N.combine(ref_genome)).map {meta, vcf -> 
-                [meta.subMap('sampleID', 'chr'), vcf]
+        if (params.phasing == 'whatshap'){
+            phasing = WHATSHAP(pileup.combine(ref_genome)).map {meta, vcf -> 
+                    [meta.subMap('sampleID', 'chr'), vcf]
+            }
+        } else if (params.phasing == 'longphase'){
+            LONGPHASE(split_bam, pileup, ref_genome, bam)
+            phasing = LONGPHASE.out.vcf
         }
 
-        // read 
-        phasing = READ_PHASING(whatshap_N.join(whatshap_T))
+        phasing_gz = BCFTOOLS_INDEX(phasing)
+        //ref_phasing = SHAPEIT4(phasing_gz)
 
     emit:
-        phasing    
-
-
+        //ref_phasing
+        phasing_gz
 }
 
 
