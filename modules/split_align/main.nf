@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process SPLIT_ALIGN {
-  tag "${meta.sampleID}-chr${ch}"
+  tag "${meta.sampleID}-${ch}"
   container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
 
 
@@ -15,9 +15,9 @@ process SPLIT_ALIGN {
     """
 
     #!/usr/bin/env bash
-    OUTPUT_BAM="${meta.sampleID}_${meta.type}_chr${ch}.bam"
+    OUTPUT_BAM="${meta.sampleID}_${meta.type}_${ch}.bam"
 
-    samtools view -@ 12 -b -h -o \${OUTPUT_BAM} "${align}" "chr${ch}"
+    samtools view -@ 12 -b -h -o \${OUTPUT_BAM} "${align}" "${ch}"
     samtools index -@ 12 \${OUTPUT_BAM}
 
     """

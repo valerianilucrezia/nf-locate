@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process BCFTOOLS_INDEX {
-    tag "${meta.sampleID}-chr${meta.chr}"
+    tag "${meta.sampleID}-${meta.chr}"
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
 
     input:
@@ -12,7 +12,7 @@ process BCFTOOLS_INDEX {
     script:
 
     """
-    bcftools sort ${vcf} -o ${meta.sampleID}_chr${meta.chr}.vcf.gz -O z
-    bcftools index ${meta.sampleID}_chr${meta.chr}.vcf.gz
+    bcftools sort ${vcf} -o ${meta.sampleID}_${meta.chr}.vcf.gz -O z
+    bcftools index ${meta.sampleID}_${meta.chr}.vcf.gz
     """
 }

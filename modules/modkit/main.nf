@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process MODKIT {
-    tag "${meta.sampleID}-chr${meta.chr}-${meta.hp}"
+    tag "${meta.sampleID}-${meta.chr}-${meta.hp}"
     container 'https://depot.galaxyproject.org/singularity/ont-modkit%3A0.3.1--h5c23e0d_1'
 
     input:
@@ -15,7 +15,7 @@ process MODKIT {
 
     """
 
-    modkit pileup ${bam} "${meta.hp}${meta.sampleID}_chr${meta.chr}_methylation.bed" \
+    modkit pileup ${bam} "${meta.hp}${meta.sampleID}_${meta.chr}_methylation.bed" \
       --ref ${ref_genome} \
       --ignore h \
       --cpg \

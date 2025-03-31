@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process WHATSHAP {
-    tag "${meta.sampleID}-${meta.type}-chr${meta.chr}"
+    tag "${meta.sampleID}-${meta.type}-${meta.chr}"
     container 'https://depot.galaxyproject.org/singularity/whatshap%3A2.3--py39h1f90b4d_0'
 
     input:
@@ -15,7 +15,7 @@ process WHATSHAP {
 
     INPUT_BAM="${bam}"
     INPUT_VCF="${vcf}"
-    OUTPUT_VCF="${meta.sampleID}_${meta.type}_chr${meta.chr}_phased.vcf"
+    OUTPUT_VCF="${meta.sampleID}_${meta.type}_${meta.chr}_phased.vcf"
 
     whatshap phase -o \${OUTPUT_VCF} \
         --ignore-read-groups \

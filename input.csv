@@ -1,2 +1,0 @@
-sampleID,tumor_alignment,tumor_alignment_index,normal_alignment,normal_alignment_index
-COLO829,/orfeo/scratch/area/lvaleriani/COLO829/raw/COLO829/COLO829.bam,/orfeo/scratch/area/lvaleriani/COLO829/raw/COLO829/COLO829.bam.bai,/orfeo/scratch/area/lvaleriani/COLO829/raw/COLO829_L/COLO829_L.bam,/orfeo/scratch/area/lvaleriani/COLO829/raw/COLO829_L/COLO829_L.bam.bai

@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process LONGPHASE {
-    tag "${meta.sampleID}-${meta.type}-chr${meta.chr}"
+    tag "${meta.sampleID}-${meta.type}-${meta.chr}"
     container 'https://depot.galaxyproject.org/singularity/longphase%3A1.7.3--hf5e1c6e_0'
 
     input:
@@ -22,7 +22,7 @@ process LONGPHASE {
         -b ${bam} \
         -r ${ref_genome} \
         -t 24 \
-        -o ${meta.sampleID}_chr${meta.chr}_snp \
+        -o ${meta.sampleID}_${meta.chr}_snp \
         --ont
     """
 }

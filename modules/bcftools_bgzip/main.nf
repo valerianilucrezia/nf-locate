@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process BCFTOOLS_BGZIP {
-    tag "${meta.sampleID}-chr${meta.chr}"
+    tag "${meta.sampleID}-${meta.chr}"
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
 
     input:
@@ -14,7 +14,7 @@ process BCFTOOLS_BGZIP {
 
     """
     bgzip -@ 24 ${vcf}
-    tabix -f -p bed "${meta.hp}${meta.sampleID}_chr${meta.chr}_methylation.bed.gz"
+    tabix -f -p bed "${meta.hp}${meta.sampleID}_${meta.chr}_methylation.bed.gz"
 
     """
 }

@@ -1,37 +1,29 @@
 #!/usr/bin/env nextflow
 
 include { PILEUP_CN } from '../../modules/pileup/main'
-include { WHATSHAP } from '../../modules/whatshap/main'
-include { LONGPHASE } from '../../subworkflows/longphase/main'
-include { SHAPEIT4 } from '../../modules/shapeit4/main'
-include {BCFTOOLS_INDEX } from '../../modules/bcftools_index/main'
+include { JOIN_VCF } from '../../modules/join_vcf/main'
+
 
 workflow PILEUP {
     take:
         split_bam 
         bed
         ref_genome
-        bam
     
     main:
         // pileup
-        pileup = PILEUP_CN(split_bam.combine(bed).combine(ref_genome))
+        input = split_bam.map{ meta, bam, bai ->
+            def info = [sampleID:meta.sampleID, type:meta.type]
+            [meta.subMap('chr'), info, bam, bai]}.combine(bed, by: 0).map{ meta, info, bam, bai, b ->
+            meta = meta + [sampleID:info.sampleID, type:info.type]
+            [meta, bam, bai, b]
+            }.combine(ref_genome)
 
-        if (params.phasing == 'whatshap'){
-            phasing = WHATSHAP(pileup.combine(ref_genome)).map {meta, vcf -> 
-                    [meta.subMap('sampleID', 'chr'), vcf]
-            }
-        } else if (params.phasing == 'longphase'){
-            LONGPHASE(split_bam, pileup, ref_genome, bam)
-            phasing = LONGPHASE.out.vcf
-        }
-
-        phasing_gz = BCFTOOLS_INDEX(phasing)
-        //ref_phasing = SHAPEIT4(phasing_gz)
+        pileup = PILEUP_CN(input)
+        JOIN_VCF(pileup.groupTuple(by: 0))
 
     emit:
-        //ref_phasing
-        phasing_gz
+        JOIN_VCF.out.vcf
 }
 
 

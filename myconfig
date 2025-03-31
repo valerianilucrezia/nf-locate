@@ -8,8 +8,7 @@ env {
 
 process {
     executor='slurm'
-    queue='EPYC'
-    clusterOptions='--exclude epyc007'
+    queue='GENOA'
 }
 
 

@@ -14,10 +14,8 @@ workflow LONGPHASE {
     main:
         sv = SNIFFLE(bam.combine(ref_genome)).map {meta, res -> 
         [res]}
-        pileup = vcf.map {meta, bam, bai, file ->
-        [meta, file]}
         modcall = MODCALL(split_bam.combine(ref_genome))
-        LONGPHASE_PHASE(split_bam.join(modcall).join(pileup).combine(sv).combine(ref_genome))
+        LONGPHASE_PHASE(split_bam.join(modcall).join(vcf).combine(sv).combine(ref_genome))
 
     emit:
         vcf = LONGPHASE_PHASE.out.vcf
