@@ -1,21 +1,44 @@
 # nf-locate pipeline
-Nextflow pipeline for pre-processing long-reads data, under 3 different setting:
-- Tumor-Normal matched long-reads data (2 `.bam` files)
-- Tumor-only long-reads data (1 `.bam` file)
-- Tumor long-reads and Normal short-reads data (2 `.bam` files)
+Nextflow pipeline for pre-processing long-reads data and calling allele-specific copy number and methylation events.
+
+The pipeline can be runned under 3 different setting, specified using the `sample` parameter:
+- `nanopore`: tumor-normal matched long-read data (2 `.bam` files)
+- `tumor-only`: tumor-only long-reads data (1 `.bam` file)
+- `mix`: tumor long-read and normal short-read data (2 `.bam` files)
+
 
 The output files of this pipeline (`.rds` and `.csv` files) are then used by [LOCATE](https://github.com/valerianilucrezia/locate) package for inferring copy number alterations.
 
 # Pipeline overview   
 The data pre-processing pipeline is composed by 3 workflows:
 - `variant_calling`
-- `pileup`
-- `methylation_calling`
+- `pileup_phasing` that contains also the `longphase` workflow
+- `methylation`
+- `locate`
 
 The final `locate` workflow is meant for collecting and smoothing data and finally running [LOCATE](https://github.com/valerianilucrezia/locate) tool.
 
 
-<img width="863" alt="Screenshot 2024-09-10 alle 16 51 49" src="https://github.com/user-attachments/assets/714b6b90-61ea-4dd7-ba7a-8bcdbab70686">
+<img width="863" src="https://github.com/valerianilucrezia/nf-locate/blob/905345a44d84a771bb8e36412505e0c84974c6cb/docs/nf-locate_schema.png">
+
+## Tools used:
+- `variant_calling`
+  - [clairS](https://github.com/HKU-BAL/ClairS)
+  - [clairTO](https://github.com/HKU-BAL/ClairS-TO)
+- `pileup_phasing`
+  - [mpileup](http://www.htslib.org/doc/samtools-mpileup.html)
+  - [longphase](https://github.com/twolinin/longphase)
+    - `modcall` and `phase` commands
+  - [shapeit4](https://github.com/odelaneau/shapeit4)
+  - [Sniffles2](https://github.com/fritzsedlazeck/Sniffles)
+- `methylation`
+  - [whatshap](https://github.com/whatshap/whatshap)
+    - `haplotag` and `split` commands
+  - [modkit](https://github.com/nanoporetech/modkit)
+    - `pileup` and `dmr` commands
+- `locate`
+  - [LOCATE](https://github.com/valerianilucrezia/locate) 
+
 
 
 # How to run the pipeline
@@ -46,7 +69,7 @@ s1,s1.bam,s1.bam.bai
 ### Parameters
 - `ref_genome`
 - `ref_fai`
-- `bed_files`
-- `map files`
-- `bcf files`
+- `bed`
+- `map`
+- `bcf`
 
