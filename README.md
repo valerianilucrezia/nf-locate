@@ -7,10 +7,10 @@ Nextflow pipeline for pre-processing long-reads data, under 3 different setting:
 The output files of this pipeline (`.rds` and `.csv` files) are then used by [LOCATE](https://github.com/valerianilucrezia/locate) package for inferring copy number alterations.
 
 # Pipeline overview   
-The data pre-processing pipeline is composed by 3 parallel workflows:
+The data pre-processing pipeline is composed by 3 workflows:
 - `variant_calling`
-- `methylation_calling`
 - `pileup`
+- `methylation_calling`
 
 The final `locate` workflow is meant for collecting and smoothing data and finally running [LOCATE](https://github.com/valerianilucrezia/locate) tool.
 
@@ -46,5 +46,7 @@ s1,s1.bam,s1.bam.bai
 ### Parameters
 - `ref_genome`
 - `ref_fai`
-- `bed_file`
+- `bed_files`
+- `map files`
+- `bcf files`
 
