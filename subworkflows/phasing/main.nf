@@ -24,11 +24,11 @@ workflow PHASING {
         }
 
         phasing_gz = BCFTOOLS_INDEX_1(phasing)
-        //ref_phasing = SHAPEIT4(phasing_gz)
-        //ref_phasing_gz = BCFTOOLS_INDEX_2(ref_phasing)
+        ref_phasing = SHAPEIT4(phasing_gz)
+        ref_phasing_gz = BCFTOOLS_INDEX_2(ref_phasing)
 
     emit:
-        phasing_gz
+        ref_phasing_gz
 }
 
 

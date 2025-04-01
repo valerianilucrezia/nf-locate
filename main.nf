@@ -8,7 +8,7 @@ include { PILEUP as PILEUP_T } from "${baseDir}/subworkflows/pileup/main"
 include { PILEUP as PILEUP_N } from "${baseDir}/subworkflows/pileup/main"
 include { PHASING as PHASING_T } from "${baseDir}/subworkflows/phasing/main"
 include { PHASING as PHASING_N } from "${baseDir}/subworkflows/phasing/main"
-//include { METYLATION_CALLING } from "${baseDir}/subworkflows/methylation_calling/main"
+include { METYLATION_CALLING } from "${baseDir}/subworkflows/methylation_calling/main"
 include { METYLATION_HAPLOTYPE as METYLATION_HAPLOTYPE_T } from "${baseDir}/subworkflows/methylation_haplotype/main"
 include { METYLATION_HAPLOTYPE as METYLATION_HAPLOTYPE_N } from "${baseDir}/subworkflows/methylation_haplotype/main"
 
@@ -38,7 +38,7 @@ workflow {
         [meta, file]}
 
     // chr channel
-    chromosome = Channel.from(21..22)
+    chromosome = Channel.from(1..22)
     chromosome = chromosome.map{ chr -> 
         ['chr'+chr] }
 

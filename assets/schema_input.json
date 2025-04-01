@@ -70,7 +70,7 @@
                 "anyOf": [
                     {
                         "type": "string",
-                        "pattern": "^\\S+\\.(bai|crai)$"
+                        "pattern": "^\\S+\\.(bai|crai|csi)$"
                     },
                     {
                         "type": "string",

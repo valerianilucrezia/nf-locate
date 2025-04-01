@@ -1,3 +1,3 @@
 sampleID,tumor_alignment,tumor_alignment_index,normal_alignment,normal_alignment_index
-PDO6,
-PDO61,
+PDO6,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/run_5mCG_5hmCG_bam/PDO6_5mCG_5hmCG_sorted.bam,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/run_5mCG_5hmCG_bam/PDO6_5mCG_5hmCG_sorted.bam.csi,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/illumina/bam/PDO6_A/PDO6.bam,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/illumina/bam/PDO6_A/PDO6.bam.bai
+PDO61,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/run_5mCG_5hmCG_bam/PDO61_5mCG_5hmCG_sorted.bam,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/run_5mCG_5hmCG_bam/PDO61_5mCG_5hmCG_sorted.bam.csi,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/illumina/bam/PDO61_A/PDO61.bam,/orfeo/scratch/area/lvaleriani/ORID0077_Scolorina/illumina/bam/PDO61_A/PDO61.bam.bai

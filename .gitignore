@@ -3,8 +3,8 @@
 .Rhistory
 **.DS_Store
 **._*
-organoids.csv
+input_organoids.csv
 work/*
 res_*
 .nextflow
-results/
+results*
