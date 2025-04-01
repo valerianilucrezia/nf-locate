@@ -7,8 +7,13 @@ env {
 }
 
 process {
-    executor='slurm'
     queue='GENOA'
+}
+
+executor {
+    name = 'slurm'
+    queueSize = 50
+    submitRateLimit = '10 sec'
 }
 
 

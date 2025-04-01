@@ -1,5 +1,6 @@
 *.out*
 *log*
+*err*
 .Rhistory
 **.DS_Store
 **._*

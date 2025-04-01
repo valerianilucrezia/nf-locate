@@ -6,17 +6,17 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=10G
+#SBATCH --mem=50G
 #SBATCH --time=120:00:00
 #SBATCH -A lade
-#SBATCH --output=log
+#SBATCH --output=log_%j
+#SBATCH --error=err_%j
 
 module load singularity/3.10.4
 module load java
 
 pipeline=/orfeo/scratch/area/lvaleriani/nf-locate
 /orfeo/scratch/area/lvaleriani/nextflow run $pipeline/main.nf \
-    -resume \
     -c $pipeline/myconfig \
     --input $pipeline/input_organoids.csv \
     --outdir $pipeline/results_organoids \
