@@ -2,23 +2,23 @@ nextflow.enable.dsl=2
 cleanup=false
 
 
-env {
-     SINGULARITY_TMPDIR="/orfeo/scratch/area/lvaleriani/tmp"
+singularity {
+   enabled = true
+   envWhitelist = "SINGULARITY_TMPDIR"
+   singularity.runOptions = '--bind /orfeo:/orfeo --contain --writable-tmpfs'
+   cacheDir = "$NXF_SINGULARITY_CACHEDIR" 
 }
+
 
 process {
     queue='GENOA'
+    maxRetries=2
+    beforeScript="source /orfeo/scratch/area/lvaleriani/nf-locate/prolog.sh"
+    afterScript="source /orfeo/scratch/area/lvaleriani/nf-locate/epilog.sh"
 }
 
 executor {
     name = 'slurm'
     queueSize = 50
     submitRateLimit = '10 sec'
-}
-
-
-singularity {
-    singularity.envWhitelist = ["SINGULARITY_TMPDIR"]
-    singularity.runOptions = '--bind /orfeo:/orfeo --bind $SINGULARITY_TMPDIR:/tmp'
-    singularity.cacheDir = ["NXF_SINGULARITY_CACHEDIR"]
 }

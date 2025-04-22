@@ -9,3 +9,6 @@ work/*
 res_*
 .nextflow
 results*
+log_files*
+test_*
+files*

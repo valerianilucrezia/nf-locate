@@ -59,16 +59,19 @@ workflow {
     pileup_T = PILEUP_T(split_T, bed, ref_genome)
     pileup_N = PILEUP_N(split_N, bed, ref_genome)
 
-    if (params.sample == 'nanopore'){
-        phasing_T = PHASING_T(pileup_T, split_T, ref_genome, input_T)
-        meth_T = METYLATION_HAPLOTYPE_T(pileup_T.join(split_T), ref_genome)
+    phasing_T = PHASING_T(pileup_T, split_T, ref_genome, input_T)
+    meth_T = METYLATION_HAPLOTYPE_T(phasing_T.join(split_T), ref_genome)
 
-        phasing_N = PHASING_N(pileup_N, split_N, ref_genome, input_N)
-        meth_N = METYLATION_HAPLOTYPE_N(pileup_N, split_N)
-        
-    } elif (params.sample == 'mix'){
-        phasing_T = PHASING_T(pileup_T, split_T, ref_genome, input_T)
-        meth_T = METYLATION_HAPLOTYPE_T(pileup_T.join(split_T), ref_genome)
-    }
+    //if (params.sample == 'nanopore'){
+    //    phasing_T = PHASING_T(pileup_T, split_T, ref_genome, input_T)
+    //    meth_T = METYLATION_HAPLOTYPE_T(pileup_T.join(split_T), ref_genome)
+    //
+    //    phasing_N = PHASING_N(pileup_N, split_N, ref_genome, input_N)
+    //    meth_N = METYLATION_HAPLOTYPE_N(pileup_N, split_N)
+    //    
+    //} elif (params.sample == 'mix'){
+    //    phasing_T = PHASING_T(pileup_T, split_T, ref_genome, input_T)
+    //    meth_T = METYLATION_HAPLOTYPE_T(pileup_T.join(split_T), ref_genome)
+    //}
 }
 

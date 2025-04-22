@@ -14,14 +14,14 @@ workflow PHASING {
         bam
     
     main:
-        if (params.phasing == 'whatshap'){
-            phasing = WHATSHAP(pileup.combine(ref_genome)).map {meta, vcf -> 
-                    [meta.subMap('sampleID', 'chr'), vcf]
-            }
-        } else if (params.phasing == 'longphase'){
-            LONGPHASE(split_bam, pileup, ref_genome, bam)
-            phasing = LONGPHASE.out.vcf
-        }
+        //if (params.phasing == 'whatshap'){
+        //    phasing = WHATSHAP(pileup.combine(ref_genome)).map {meta, vcf -> 
+        //            [meta.subMap('sampleID', 'chr'), vcf]
+        //    }
+        //} else if (params.phasing == 'longphase'){
+        LONGPHASE(split_bam, pileup, ref_genome, bam)
+        phasing = LONGPHASE.out.vcf
+        //}
 
         phasing_gz = BCFTOOLS_INDEX_1(phasing)
         ref_phasing = SHAPEIT4(phasing_gz)
