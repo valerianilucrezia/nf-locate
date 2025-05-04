@@ -14,7 +14,7 @@ process BCFTOOLS_BGZIP {
 
     """
     bgzip -@ 24 ${vcf}
-    tabix -f -p bed "${meta.hp}${meta.sampleID}_${meta.chr}_methylation.bed.gz"
+    tabix -f -p bed ${vcf}.gz
 
     """
 }

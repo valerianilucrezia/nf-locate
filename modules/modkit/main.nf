@@ -15,7 +15,7 @@ process MODKIT {
 
     """
 
-    modkit pileup ${bam} "${meta.hp}${meta.sampleID}_${meta.chr}_methylation.bed" \
+    modkit pileup ${bam} "${meta.hp}_${meta.sampleID}_${meta.chr}_methylation.bed" \
       --ref ${ref_genome} \
       --ignore h \
       --cpg \

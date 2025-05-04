@@ -13,19 +13,18 @@ include { DMR } from '../../modules/dmr/'
 
 workflow METYLATION_HAPLOTYPE {
     take:
-        data
+        haplotag_bam
         ref_genome
     
     main:
-        haplotag_bam = HAPLOTAG_BAM(data.combine(ref_genome))
         SPLIT_HAPLOTYPE(haplotag_bam)
 
         h1 = SPLIT_HAPLOTYPE.out.h1_bam.map {meta, bam ->
-            meta = meta + [hp:'H1_']
+            meta = meta + [hp:'H1']
             [meta, bam]
         }
         h2 = SPLIT_HAPLOTYPE.out.h2_bam.map {meta, bam ->
-            meta = meta + [hp:'H2_']
+            meta = meta + [hp:'H2']
             [meta, bam]
         }
 

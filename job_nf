@@ -17,7 +17,7 @@ module load java
 pipeline=/orfeo/scratch/area/lvaleriani/nf-locate
 /orfeo/scratch/area/lvaleriani/nextflow run $pipeline/main.nf \
     -c $pipeline/myconfig \
-    --input $pipeline/test/input_organoids.csv \
-    --outdir $pipeline/results_organoids \
+    --input $pipeline/samplesheet/input_colo829.csv \
+    --outdir $pipeline/results_colo829 \
     -profile singularity \
     -resume

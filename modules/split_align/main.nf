@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process SPLIT_ALIGN {
-  tag "${meta.sampleID}-${ch}"
+  tag "${meta.sampleID}-${ch}-${meta.type}"
   container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
 
 

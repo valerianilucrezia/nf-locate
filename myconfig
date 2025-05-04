@@ -5,7 +5,7 @@ cleanup=false
 singularity {
    enabled = true
    envWhitelist = "SINGULARITY_TMPDIR"
-   singularity.runOptions = '--bind /orfeo:/orfeo --contain --writable-tmpfs'
+   singularity.runOptions = '--bind /orfeo:/orfeo'
    cacheDir = "$NXF_SINGULARITY_CACHEDIR" 
 }
 

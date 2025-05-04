@@ -4,11 +4,11 @@
 .Rhistory
 **.DS_Store
 **._*
-input_organoids.csv
+*input_*
 work/*
 res_*
 .nextflow
 results*
 log_files*
-test_*
+test*
 files*

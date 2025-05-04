@@ -15,7 +15,7 @@ process CLAIRS {
 
   script:
   """
-  run_clairs \
+  /opt/bin/run_clair3.sh \
   --tumor_bam_fn="${tumor_bam}" \
   --normal_bam_fn="${normal_bam}"\
   --ref_fn="${ref_genome}"\
