@@ -2,6 +2,8 @@
 
 process BCFTOOLS_BGZIP {
     tag "${meta.sampleID}-${meta.chr}"
+    label "process_low"
+    label "error_retry"
     container 'https://depot.galaxyproject.org/singularity/bcftools%3A1.17--haef29d1_0'
 
     input:

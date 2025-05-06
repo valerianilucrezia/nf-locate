@@ -20,8 +20,6 @@ include { METYLATION_HAPLOTYPE as METYLATION_HAPLOTYPE_N } from "${baseDir}/subw
 include { MODKIT as MODKIT_T } from "${baseDir}/modules/modkit/main"
 include { MODKIT as MODKIT_N } from "${baseDir}/modules/modkit/main"
 include { DMR } from "${baseDir}/modules/dmr/main"
-include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_T } from "${baseDir}/modules/samtools_index/"
-include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_N } from "${baseDir}/modules/samtools_index/"
 include {BCFTOOLS_BGZIP as BCFTOOLS_BGZIP_N } from "${baseDir}/modules/bcftools_bgzip/"
 include {BCFTOOLS_BGZIP as BCFTOOLS_BGZIP_T } from "${baseDir}/modules/bcftools_bgzip/"
 

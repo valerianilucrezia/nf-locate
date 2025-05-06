@@ -2,6 +2,8 @@
 
 process SPLIT_ALIGN {
   tag "${meta.sampleID}-${ch}-${meta.type}"
+  labe "process_medium"
+  label "error_retry"
   container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
 
 
@@ -13,8 +15,6 @@ process SPLIT_ALIGN {
 
   script:
     """
-
-    #!/usr/bin/env bash
     OUTPUT_BAM="${meta.sampleID}_${meta.type}_${ch}.bam"
 
     samtools view -@ 12 -b -h -o \${OUTPUT_BAM} "${align}" "${ch}"

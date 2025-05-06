@@ -13,3 +13,5 @@ log_files*
 test*
 files*
 *.sh
+myconfig
+job_nf

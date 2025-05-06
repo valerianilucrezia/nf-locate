@@ -2,6 +2,8 @@
 
 process SHAPEIT4 {
     tag "${meta.sampleID}-${meta.chr}"
+    label "process_high_long"
+    label "error_retry"
     container 'https://depot.galaxyproject.org/singularity/shapeit4%3A4.1.3--h3ac2748_0'
 
     input:

@@ -2,6 +2,8 @@
 
 process LONGPHASE {
     tag "${meta.sampleID}-${meta.type}-${meta.chr}"
+    label "process_high"
+    label "error_retry"
     container 'https://depot.galaxyproject.org/singularity/longphase%3A1.7.3--hf5e1c6e_0'
 
     input:

@@ -2,8 +2,9 @@
 
 process SPLIT_HAPLOTYPE {
   tag "${meta.sampleID}-${meta.chr}-${meta.type}"
+  label "process_low"
+  label "error_retry"
   container 'https://depot.galaxyproject.org/singularity/whatshap%3A2.3--py39h1f90b4d_0'
-
 
   input:
     tuple val(meta), path(bam), path(haplotag_list)
@@ -22,7 +23,6 @@ process SPLIT_HAPLOTYPE {
         --output-untagged untag_${meta.sampleID}_${meta.chr}.bam \
         ${bam} \
         ${haplotag_list}
-
     """
 
 }

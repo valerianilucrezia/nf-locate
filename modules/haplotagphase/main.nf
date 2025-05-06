@@ -2,6 +2,8 @@
 
 process HAPLOTAGPHASE {
   tag "${meta.sampleID}-${meta.chr}"
+  label "process_medium"
+  label "error_retry"
   container 'https://depot.galaxyproject.org/singularity/whatshap%3A2.3--py39h1f90b4d_0'
 
   input:

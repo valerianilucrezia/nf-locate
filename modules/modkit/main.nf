@@ -2,6 +2,8 @@
 
 process MODKIT {
     tag "${meta.sampleID}-${meta.chr}-${meta.hp}"
+    label "process_medium"
+    label "error_retry"
     container 'https://depot.galaxyproject.org/singularity/ont-modkit%3A0.3.1--h5c23e0d_1'
 
     input:
