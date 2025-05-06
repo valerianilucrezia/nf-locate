@@ -57,8 +57,7 @@ workflow {
         [meta, file]}
 
     // chr channel
-    //chromosome = Channel.from(1..22)
-    chromosome = Channel.from([10,22])
+    chromosome = Channel.from(1..22)
     chromosome = chromosome.map{ chr -> 
         ['chr'+chr] }
 

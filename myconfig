@@ -11,14 +11,14 @@ singularity {
 
 
 process {
-    queue='EPYC'
-    maxRetries=2
+    queue='GENOA'
     beforeScript="source /orfeo/scratch/area/lvaleriani/nf-locate/prolog.sh"
     afterScript="source /orfeo/scratch/area/lvaleriani/nf-locate/epilog.sh"
 }
 
 executor {
     name = 'slurm'
-    queueSize = 50
-    submitRateLimit = '10 sec'
+    queueSize = 40
+    submitRateLimit = '1sec'
+    pollInterval = '1s'
 }

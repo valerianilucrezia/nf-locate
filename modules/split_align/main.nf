@@ -2,7 +2,7 @@
 
 process SPLIT_ALIGN {
   tag "${meta.sampleID}-${ch}-${meta.type}"
-  labe "process_medium"
+  label "process_medium"
   label "error_retry"
   container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
 

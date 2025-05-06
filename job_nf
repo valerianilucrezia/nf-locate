@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=50G
-#SBATCH --time=150:00:00
+#SBATCH --time=10:00:00
 #SBATCH -A lade
 #SBATCH --output=log_%j
 #SBATCH --error=err_%j
@@ -19,5 +19,4 @@ pipeline=/orfeo/scratch/area/lvaleriani/nf-locate
     -c $pipeline/myconfig \
     --input $pipeline/samplesheet/input_colo829.csv \
     --outdir $pipeline/results_colo829 \
-    -profile singularity \
-    -resume
+    -profile singularity
