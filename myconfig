@@ -11,7 +11,7 @@ singularity {
 
 
 process {
-    queue='GENOA'
+    queue='EPYC'
     maxRetries=2
     beforeScript="source /orfeo/scratch/area/lvaleriani/nf-locate/prolog.sh"
     afterScript="source /orfeo/scratch/area/lvaleriani/nf-locate/epilog.sh"

@@ -12,3 +12,4 @@ results*
 log_files*
 test*
 files*
+*.sh

@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process HAPLOTAG_BAM {
-  tag "${meta.sampleID}-${meta.chr}"
+  tag "${meta.sampleID}-${meta.chr}-${meta.type}"
   container 'https://depot.galaxyproject.org/singularity/whatshap%3A2.3--py39h1f90b4d_0'
 
 

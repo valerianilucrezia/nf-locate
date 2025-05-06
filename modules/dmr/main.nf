@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process DMR {
-    tag "${meta.sampleID}-${meta.chr}"
+    tag "${meta.sampleID}-${meta.chr}-${meta.type}"
     container 'https://depot.galaxyproject.org/singularity/ont-modkit%3A0.3.1--h5c23e0d_1'
 
     input:

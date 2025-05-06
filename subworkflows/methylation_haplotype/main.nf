@@ -35,9 +35,9 @@ workflow METYLATION_HAPLOTYPE {
         MODKIT_H2(index_h2.combine(ref_genome))
 
         meth_h1 = BCFTOOLS_BGZIP_H1(MODKIT_H1.out.bed).bed.map{meta, bed, idx -> 
-            [meta.subMap('sampleID', 'chr'), bed, idx]}
+            [meta.subMap('sampleID', 'chr', 'type'), bed, idx]}
         meth_h2 = BCFTOOLS_BGZIP_H2(MODKIT_H2.out.bed).bed.map{meta, bed, idx -> 
-            [meta.subMap('sampleID', 'chr'), bed, idx]}
+            [meta.subMap('sampleID', 'chr', 'type'), bed, idx]}
 
         DMR(meth_h1.join(meth_h2).combine(ref_genome))
 

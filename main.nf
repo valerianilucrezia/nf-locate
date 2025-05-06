@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-// include { VARIANT_CALLING } from "${baseDir}/subworkflows/variant_calling/main"
 include { SPLIT_ALIGN as SPLIT_ALIGN_N } from "${baseDir}/modules/split_align/main"
 include { SPLIT_ALIGN as SPLIT_ALIGN_T } from "${baseDir}/modules/split_align/main"
+include { CLAIRS } from "${baseDir}/modules/clairS/main.nf"
 include { CLAIR3 as CLAIR3_T } from "${baseDir}/modules/clair3/main"
 include { CLAIR3 as CLAIR3_N } from "${baseDir}/modules/clair3/main"
 include { MODCALL } from "${baseDir}/modules/modcall/"
@@ -30,6 +30,7 @@ include { samplesheetToList } from 'plugin/nf-schema'
 workflow {  
     // samplesheet validation
     input = params.input ? Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json")) : Channel.empty()
+  
     input_T = input.map{ meta, bamT, baiT, bamN, baiN -> 
             meta = meta + [type:'Tumor']
             [meta, bamT, baiT] }
@@ -43,6 +44,14 @@ workflow {
     ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
     ref_genome = ref_genome_ch.combine(ref_fai_ch)
 
+    // call somatic variant
+    input_vc = input_T.map{meta, bam, bai -> 
+      [meta.subMap('sampleID'), bam,bai]
+    }.join(input_N.map{meta, bam, bai -> 
+      [meta.subMap('sampleID'), bam,bai]
+    }).combine(ref_genome)
+    CLAIRS(input_vc)
+
     // vcf channel
     vcf = Channel.fromPath("${params.vcf}/chr*")
     vcf = vcf.map{ file ->
@@ -55,7 +64,6 @@ workflow {
     chromosome = chromosome.map{ chr -> 
         ['chr'+chr] }
 
-    // pipeline main
     // split_bam
     split_T = SPLIT_ALIGN_T(chromosome.combine(input_T)).map {ch, meta, bam, bai -> 
                 meta = meta + [chr:ch]
@@ -82,6 +90,7 @@ workflow {
             [meta, bam, bai, b]
             }.combine(ref_genome)
     
+
     // call var in normal and tumor
     CLAIR3_T(input_T)
     CLAIR3_N(input_N)
@@ -100,23 +109,17 @@ workflow {
       [meta.subMap('sampleID','chr'), vcf, idx]
     }.join(bam_tumor, by:0).combine(ref_genome)
     
-    HAPLOTAG_BAM_T(input_haplotag_T)
+    HAPLOTAG_BAM_T(input_haplotag_T.map{meta,vcf,idx,bam,bai,ref,fai -> 
+      meta = meta+[type:'Tumor']
+      [meta,vcf,idx,bam,bai,ref,fai]})
     bam_haplotag = SAMTOOLS_INDEX(HAPLOTAG_BAM_T.out.bam)
-    
-    // haplotag normal
-    bam_normal = split_N.map{ meta, bam, bai -> 
-      [meta.subMap('sampleID','chr'), bam, bai]
-    }
-    
-    input_haplotag_N = idx_vcf.map{ meta, vcf, idx -> 
-      [meta.subMap('sampleID','chr'), vcf, idx]
-    }.join(bam_normal, by:0).combine(ref_genome)
+
+    // haplotag normal    
+    input_haplotag_N = idx_vcf.join(split_N, by:0).combine(ref_genome)
     HAPLOTAG_BAM_N(input_haplotag_N)
     
     // phase tumour vcf
-    input_phase = CLAIR3_T.out.pileup.map{meta, vcf, idx ->
-      [meta.subMap('sampleID','chr'), vcf, idx]
-    }.join(bam_haplotag, by:0).combine(ref_genome)
+    input_phase = CLAIR3_T.out.pileup.join(bam_haplotag, by:0).combine(ref_genome)
     HAPLOTAGPHASE(input_phase)
     
     // phase tumour with shapeit
@@ -131,6 +134,7 @@ workflow {
       meta = meta + [hp:'Normal']
       [meta, bam, bai]
     }.combine(ref_genome))
+
     MODKIT_T(split_T.map{meta, bam, bai -> 
       meta = meta + [hp:'Tumor']
       [meta, bam, bai]
@@ -150,7 +154,10 @@ workflow {
     }
     
     // dmr tumor-normal
-    DMR(bed_T.join(bed_N).combine(ref_genome))
+    DMR(bed_T.join(bed_N).combine(ref_genome).map{meta, bed1, idx1, bed2, idx2, ref, idx ->
+      meta = meta + [type:'Tumor-Normal']
+      [meta, bed1, idx1, bed2, idx2, ref, idx]
+    })
   
 }
 
