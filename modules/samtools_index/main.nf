@@ -2,7 +2,7 @@
 
 process SAMTOOLS_INDEX {
     tag "${meta.sampleID}-${meta.chr}"
-    label "process_medium"
+    label "process_high"
     label "error_retry"
     container 'https://depot.galaxyproject.org/singularity/samtools%3A1.9--h91753b0_8'
 

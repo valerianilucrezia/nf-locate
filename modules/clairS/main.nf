@@ -18,7 +18,7 @@ process CLAIRS {
   --tumor_bam_fn="${tumor_bam}" \
   --normal_bam_fn="${normal_bam}"\
   --ref_fn="${ref_genome}"\
-  --threads=36 \
+  --threads=12 \
   --platform=${params.platform} \
   --output_dir="" \
   --output_prefix="${meta.sampleID}_variants" \

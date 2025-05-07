@@ -20,11 +20,12 @@ workflow METYLATION_HAPLOTYPE {
         SPLIT_HAPLOTYPE(haplotag_bam)
 
         h1 = SPLIT_HAPLOTYPE.out.h1_bam.map {meta, bam ->
-            meta = meta + [hp:'H1']
+            meta = meta + [hp:'H1_'+meta.type]
             [meta, bam]
         }
+        h1.view()
         h2 = SPLIT_HAPLOTYPE.out.h2_bam.map {meta, bam ->
-            meta = meta + [hp:'H2']
+            meta = meta + [hp:'H2_'+meta.type]
             [meta, bam]
         }
 
