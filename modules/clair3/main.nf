@@ -10,9 +10,9 @@ process CLAIR3 {
   tuple val(meta), path(bam), path(bai), path(vcf), path(ref), path(fai)
 
   output:
-  tuple val(meta), path("${meta.type}/${meta.chr}/pileup.vcf.gz"), path("${meta.type}/${meta.chr}/pileup.vcf.gz.tbi"), emit: 'pileup'
-  tuple val(meta), path("${meta.type}/${meta.chr}/merge_output.vcf.gz"), path("${meta.type}/${meta.chr}/merge_output.vcf.gz.tbi"), emit: 'merge'
-  tuple val(meta), path("${meta.type}/${meta.chr}/full_alignment.vcf.gz"), path("${meta.type}/${meta.chr}/full_alignment.vcf.gz.tbi"), emit: 'full' 
+  tuple val(meta), path("pileup.vcf.gz"), path("pileup.vcf.gz.tbi"), emit: 'pileup'
+  tuple val(meta), path("merge_output.vcf.gz"), path("merge_output.vcf.gz.tbi"), emit: 'merge'
+  tuple val(meta), path("full_alignment.vcf.gz"), path("full_alignment.vcf.gz.tbi"), emit: 'full' 
 
   script:
   """
@@ -22,7 +22,7 @@ process CLAIR3 {
   --threads=12 \
   --platform="ont" \
   --model_path="/opt/models/${params.model_name}" \
-  --output="${meta.type}/${meta.chr}" \
+  --output="." \
   --vcf_fn="${vcf}"
   """
 }

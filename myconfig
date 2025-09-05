@@ -11,9 +11,33 @@ singularity {
 
 
 process {
-    queue='GENOA'
+    clusterOptions = '--account=lade --exclude=genoa013'
+    cpus          = 4
+    memory        = 10.GB
+    time          = 6.h
+    errorStrategy = 'retry'
+    maxRetries    = 3
+
     beforeScript="source /orfeo/scratch/area/lvaleriani/nf-locate/prolog.sh"
     afterScript="source /orfeo/scratch/area/lvaleriani/nf-locate/epilog.sh"
+}
+
+profiles {
+    epyc {
+        process.executor = 'slurm'
+        process.queue = 'EPYC'
+        process.resourceLimits = [ cpus: 128, memory: 512.GB, time: 100.h ]
+    }
+    genoa {
+        process.executor = 'slurm'
+        process.queue = 'GENOA'
+        process.resourceLimits = [ cpus: 64, memory: 512.GB, time: 100.h ]
+    }
+    thin {
+        process.executor = 'slurm'
+        process.queue = 'THIN'
+        process.resourceLimits = [ cpus: 24, memory: 768.GB, time: 100.h ]
+    }
 }
 
 executor {

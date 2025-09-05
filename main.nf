@@ -10,6 +10,7 @@ include { MODCALL } from "${baseDir}/modules/modcall/"
 include { LONGPHASE } from "${baseDir}/modules/longphase/"
 include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_1 } from "${baseDir}/modules/bcftools_index/"
 include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_2 } from "${baseDir}/modules/bcftools_index/"
+include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_3 } from "${baseDir}/modules/bcftools_index/"
 include { HAPLOTAG_BAM as HAPLOTAG_BAM_T } from "${baseDir}/modules/haplotag/"
 include { HAPLOTAG_BAM as HAPLOTAG_BAM_N } from "${baseDir}/modules/haplotag/"
 include { SAMTOOLS_INDEX } from "${baseDir}/modules/samtools_index/"
@@ -22,6 +23,8 @@ include { MODKIT as MODKIT_N } from "${baseDir}/modules/modkit/main"
 include { DMR } from "${baseDir}/modules/dmr/main"
 include {BCFTOOLS_BGZIP as BCFTOOLS_BGZIP_N } from "${baseDir}/modules/bcftools_bgzip/"
 include {BCFTOOLS_BGZIP as BCFTOOLS_BGZIP_T } from "${baseDir}/modules/bcftools_bgzip/"
+include { WHATSHAP } from "${baseDir}/modules/whatshap/"
+
 
 include { samplesheetToList } from 'plugin/nf-schema'
 
@@ -92,69 +95,108 @@ workflow {
     CLAIR3_T(input_T)
     CLAIR3_N(input_N)
 
-    // phase normal
-    modcall = MODCALL(split_N.combine(ref_genome))
-    LONGPHASE(split_N.join(modcall).join(CLAIR3_N.out.pileup).combine(ref_genome))
-    idx_vcf = BCFTOOLS_INDEX_1(LONGPHASE.out.vcf)
-    
-    // haplotag tumor bam
-    bam_tumor = split_T.map{ meta, bam, bai -> 
-      [meta.subMap('sampleID','chr'), bam, bai]
-    }
-    
-    input_haplotag_T = idx_vcf.map{ meta, vcf, idx -> 
-      [meta.subMap('sampleID','chr'), vcf, idx]
-    }.join(bam_tumor, by:0).combine(ref_genome)
-    
-    HAPLOTAG_BAM_T(input_haplotag_T.map{meta,vcf,idx,bam,bai,ref,fai -> 
-      meta = meta+[type:'Tumor']
-      [meta,vcf,idx,bam,bai,ref,fai]})
-    bam_haplotag = SAMTOOLS_INDEX(HAPLOTAG_BAM_T.out.bam)
+    if (params.shortread == true){
+      tmp_vcf = CLAIR3_N.out.pileup.map{ meta, vcf, tbi -> 
+                  [meta.subMap('chr', 'sampleID'), vcf, tbi]}
+      tmp_normal = split_N.map{ meta, bam, bai -> 
+                  [meta.subMap('chr', 'sampleID'), bam, bai]}
+      tmp_tumour = split_T.map{ meta, bam, bai -> 
+                  [meta.subMap('chr', 'sampleID'), bam, bai]}
 
-    // haplotag normal    
-    input_haplotag_N = idx_vcf.join(split_N, by:0).combine(ref_genome)
-    HAPLOTAG_BAM_N(input_haplotag_N)
-    
-    // phase tumour vcf
-    input_phase = CLAIR3_T.out.pileup.join(bam_haplotag, by:0).combine(ref_genome)
-    HAPLOTAGPHASE(input_phase)
-    
-    // phase tumour with shapeit
-    SHAPEIT4(BCFTOOLS_INDEX_2(HAPLOTAGPHASE.out.vcf))
-    
-    // run methylation on normal and tumor
-    METYLATION_HAPLOTYPE_T(HAPLOTAG_BAM_T.out.bam.join(HAPLOTAG_BAM_T.out.list), ref_genome)    
-    METYLATION_HAPLOTYPE_N(HAPLOTAG_BAM_N.out.bam.join(HAPLOTAG_BAM_N.out.list), ref_genome) 
+      WHATSHAP(tmp_vcf.join(tmp_normal).join(tmp_tumour).combine(ref_genome))
+      vcf_phase = WHATSHAP.out.vcf.map { meta, vcf -> 
+                meta = meta + [type:'Normal']
+                [meta, vcf]}
+      idx_vcf = BCFTOOLS_INDEX_3(vcf_phase)
+      
+      input_haplotag_T = idx_vcf.map{ meta, vcf, idx -> 
+        [meta.subMap('sampleID','chr'), vcf, idx]
+      }.join(tmp_tumour, by:0).combine(ref_genome)
 
-    // modkit tumor and normal
-    MODKIT_N(split_N.map{meta, bam, bai -> 
-      meta = meta + [hp:'Normal']
-      [meta, bam, bai]
-    }.combine(ref_genome))
+      HAPLOTAG_BAM_T(input_haplotag_T.map{meta,vcf,idx,bam,bai,ref,fai -> 
+        meta = meta+[type:'Tumor']
+        [meta,vcf,idx,bam,bai,ref,fai]})
+      bam_haplotag = SAMTOOLS_INDEX(HAPLOTAG_BAM_T.out.bam)
 
-    MODKIT_T(split_T.map{meta, bam, bai -> 
-      meta = meta + [hp:'Tumor']
-      [meta, bam, bai]
-    }.combine(ref_genome))
-    
-    bed_N = BCFTOOLS_BGZIP_N(MODKIT_N.out.bed.map{meta, bed -> 
-      meta = meta + [hp:'Normal']
-      [meta, bed]
-    }).map{meta, bed, idx ->
-      [meta.subMap('sampleID','chr'), bed, idx]
+      input_phase = CLAIR3_T.out.pileup.join(bam_haplotag, by:0).combine(ref_genome)
+      HAPLOTAGPHASE(input_phase)
+
+      SHAPEIT4(BCFTOOLS_INDEX_2(HAPLOTAGPHASE.out.vcf))
+      
+      // run methylation on tumor
+      METYLATION_HAPLOTYPE_T(HAPLOTAG_BAM_T.out.bam.join(HAPLOTAG_BAM_T.out.list), ref_genome)    
+      
+      MODKIT_T(split_T.map{meta, bam, bai -> 
+        meta = meta + [hp:'Tumor']
+        [meta, bam, bai]
+      }.combine(ref_genome))
+
+    } else {
+
+      // phase normal
+      modcall = MODCALL(split_N.combine(ref_genome))
+      LONGPHASE(split_N.join(modcall).join(CLAIR3_N.out.pileup).combine(ref_genome))
+      idx_vcf = BCFTOOLS_INDEX_1(LONGPHASE.out.vcf)
+      
+      // haplotag tumor bam
+      bam_tumor = split_T.map{ meta, bam, bai -> 
+        [meta.subMap('sampleID','chr'), bam, bai]
+      }
+      
+      input_haplotag_T = idx_vcf.map{ meta, vcf, idx -> 
+        [meta.subMap('sampleID','chr'), vcf, idx]
+      }.join(bam_tumor, by:0).combine(ref_genome)
+      
+      HAPLOTAG_BAM_T(input_haplotag_T.map{meta,vcf,idx,bam,bai,ref,fai -> 
+        meta = meta+[type:'Tumor']
+        [meta,vcf,idx,bam,bai,ref,fai]})
+      bam_haplotag = SAMTOOLS_INDEX(HAPLOTAG_BAM_T.out.bam)
+
+      // haplotag normal    
+      input_haplotag_N = idx_vcf.join(split_N, by:0).combine(ref_genome)
+      HAPLOTAG_BAM_N(input_haplotag_N)
+      
+      // phase tumour vcf
+      input_phase = CLAIR3_T.out.pileup.join(bam_haplotag, by:0).combine(ref_genome)
+      HAPLOTAGPHASE(input_phase)
+      
+      // phase tumour with shapeit
+      SHAPEIT4(BCFTOOLS_INDEX_2(HAPLOTAGPHASE.out.vcf))
+      
+      // run methylation on normal and tumor
+      METYLATION_HAPLOTYPE_T(HAPLOTAG_BAM_T.out.bam.join(HAPLOTAG_BAM_T.out.list), ref_genome)    
+      METYLATION_HAPLOTYPE_N(HAPLOTAG_BAM_N.out.bam.join(HAPLOTAG_BAM_N.out.list), ref_genome) 
+
+      // modkit tumor and normal
+      MODKIT_N(split_N.map{meta, bam, bai -> 
+        meta = meta + [hp:'Normal']
+        [meta, bam, bai]
+      }.combine(ref_genome))
+
+      MODKIT_T(split_T.map{meta, bam, bai -> 
+        meta = meta + [hp:'Tumor']
+        [meta, bam, bai]
+      }.combine(ref_genome))
+      
+      bed_N = BCFTOOLS_BGZIP_N(MODKIT_N.out.bed.map{meta, bed -> 
+        meta = meta + [hp:'Normal']
+        [meta, bed]
+      }).map{meta, bed, idx ->
+        [meta.subMap('sampleID','chr'), bed, idx]
+      }
+      bed_T = BCFTOOLS_BGZIP_T(MODKIT_T.out.bed.map{meta, bed -> 
+        meta = meta + [hp:'Tumor']
+        [meta, bed]
+      }).map{meta, bed, idx ->
+        [meta.subMap('sampleID','chr'), bed, idx]
+      }
+      
+      // dmr tumor-normal
+      DMR(bed_T.join(bed_N).combine(ref_genome).map{meta, bed1, idx1, bed2, idx2, ref, idx ->
+        meta = meta + [type:'Tumor-Normal']
+        [meta, bed1, idx1, bed2, idx2, ref, idx]
+      })
     }
-    bed_T = BCFTOOLS_BGZIP_T(MODKIT_T.out.bed.map{meta, bed -> 
-      meta = meta + [hp:'Tumor']
-      [meta, bed]
-    }).map{meta, bed, idx ->
-      [meta.subMap('sampleID','chr'), bed, idx]
-    }
-    
-    // dmr tumor-normal
-    DMR(bed_T.join(bed_N).combine(ref_genome).map{meta, bed1, idx1, bed2, idx2, ref, idx ->
-      meta = meta + [type:'Tumor-Normal']
-      [meta, bed1, idx1, bed2, idx2, ref, idx]
-    })
   
 }
 

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+#SBATCH --job-name=ONT_NF_master
+#SBATCH --partition=THIN
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=20G
+#SBATCH --time=48:00:00
+#SBATCH -A lade
+#SBATCH --output=log_%j
+#SBATCH --error=err_%j
+
+module load singularity/3.10.4
+module load java
+
+pipeline=/orfeo/scratch/area/lvaleriani/nf-locate
+work=/orfeo/cephfs/fast/area/lvaleriani/work_organoids
+
+/orfeo/scratch/area/lvaleriani/nextflow run $pipeline/main.nf \
+    -c $pipeline/myconfig \
+    --input $pipeline/samplesheet/input_organoids.csv \
+    --outdir $pipeline/results_organoids \
+    -profile singularity,genoa \
+    -work-dir $work -resume
