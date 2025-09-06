@@ -19,8 +19,7 @@ The data pre-processing pipeline is composed by 3 workflows:
 The final `locate` workflow is meant for collecting and smoothing data and finally running [LOCATE](https://github.com/valerianilucrezia/locate) tool.
 
 
-<img width="863" src="<img width="4300" height="1821" alt="nextflow_pipeline" src="https://github.com/user-attachments/assets/604fc289-e60e-4e57-af64-09a22e3fd0af" />
-">
+<img width="4300" height="1821" alt="nextflow_pipeline" src="https://github.com/user-attachments/assets/604fc289-e60e-4e57-af64-09a22e3fd0af" />
 
 ## Tools used:
 - `variant_calling`
