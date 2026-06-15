@@ -92,12 +92,7 @@ prepares them per-chromosome via the `DOWNLOAD_REFERENCES` subworkflow
 | `map`      | `null`  | Path to a directory of per-chromosome SHAPEIT4 genetic maps (e.g. `chr21.b38.gmap.gz`). If `null`, downloaded from [odelaneau/shapeit4](https://github.com/odelaneau/shapeit4/tree/master/maps). |
 | `bcf`      | `null`  | Path to a directory of per-chromosome 1000G phase3 GRCh38 reference panel BCFs/VCFs. If `null`, downloaded from the EBI 1000genomes GRCh38 release. |
 
-Expected file naming inside `vcf`/`map`/`bcf` when providing local paths is
-per-chromosome with `chrN` in the filename (e.g. `chr21.vcf.gz`,
-`chr21.b38.gmap.gz`, `chr21....vcf.gz`) — see `test_dataset/test.config` for
-a working example.
-
-### Long-read basecalling (long-read branch, `shortread = false`)
+### Long-read basecalling
 | Parameter     | Default                  | Description                                  |
 | -------------- | ------------------------- | ----------------------------------------------- |
 | `model_name`   | `r941_prom_sup_g5014`     | ONT basecalling model name, used by `modcall`/`modkit`. |
