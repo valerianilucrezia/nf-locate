@@ -15,3 +15,4 @@ files*
 *.sh
 myconfig
 job_nf
+test_dataset/

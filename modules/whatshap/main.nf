@@ -7,7 +7,7 @@ process WHATSHAP {
   container 'https://depot.galaxyproject.org/singularity/whatshap%3A2.3--py39h1f90b4d_0'
 
   input:
-    tuple val(meta), path(vcf), path(tbi), path(t_bam),  path(t_bai), path(n_bam), path(n_bai), path(ref), path(fai)
+    tuple val(meta), path(vcf), path(tbi), path(n_bam), path(n_bai), path(ref), path(fai)
 
   output:
     tuple val(meta), path('*.vcf'), emit: vcf
@@ -17,7 +17,7 @@ process WHATSHAP {
     whatshap phase \
         -o ${meta.sampleID}_${meta.chr}.vcf \
         --ignore-read-groups \
-        --reference=${ref} ${vcf} ${t_bam} ${n_bam}
+        --reference=${ref} ${vcf} ${n_bam}
     """
 
 }

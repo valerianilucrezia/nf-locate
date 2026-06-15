@@ -4,7 +4,7 @@ process CLAIR3 {
   tag "${meta.sampleID}-${meta.chr}-${meta.type}"
   label "process_high_long"
   label "error_retry"
-  container = "docker://hkubal/clair3:latest"
+  container "docker://hkubal/clair3:latest"
 
   input:
   tuple val(meta), path(bam), path(bai), path(vcf), path(ref), path(fai)

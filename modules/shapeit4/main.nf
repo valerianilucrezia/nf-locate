@@ -7,20 +7,20 @@ process SHAPEIT4 {
     container 'https://depot.galaxyproject.org/singularity/shapeit4%3A4.1.3--h3ac2748_0'
 
     input:
-      tuple val(meta), path(vcf), path(index)
+      tuple val(meta), path(vcf), path(index), path(gmap), path(panel), path(panel_idx)
 
     output:
-      tuple val(meta), path('*.vcf'), emit: 'vcf' 
+      tuple val(meta), path('*.vcf'), emit: 'vcf'
 
     script:
 
     """
     shapeit4 --input ${vcf} \
-        --map "${params.map}/${meta.chr}.b38.gmap_CHR.gz" \
+        --map ${gmap} \
         --region ${meta.chr} \
         --output "shapeit_${meta.sampleID}-${meta.chr}.vcf" \
-        --reference "${params.bcf}/ALL.${meta.chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes_chr_38.vcf.gz" \
+        --reference ${panel} \
         --use-PS 0.0001 \
-        --thread 24
+        --thread ${task.cpus}
     """
 }
