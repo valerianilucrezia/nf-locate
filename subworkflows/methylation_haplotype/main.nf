@@ -44,7 +44,9 @@ workflow METYLATION_HAPLOTYPE {
 
 
     emit:
-        dmr = DMR.out.dmr    
+        dmr = DMR.out.dmr
         seg = DMR.out.seg
+        meth_h1 = meth_h1
+        meth_h2 = meth_h2
 
 }

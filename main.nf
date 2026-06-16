@@ -31,6 +31,7 @@ include {BCFTOOLS_BGZIP as BCFTOOLS_BGZIP_T } from "${baseDir}/modules/bcftools_
 include { WHATSHAP } from "${baseDir}/modules/whatshap/"
 include { DOWNLOAD_REFERENCES } from "${baseDir}/subworkflows/download_references/main"
 include { BATTENBERG_PHASE } from "${baseDir}/modules/battenberg_phase/main"
+include { LOCATE_CN; LOCATE_METHYLATION } from "${baseDir}/subworkflows/locate/main"
 
 
 include { samplesheetToList } from 'plugin/nf-schema'
@@ -171,6 +172,13 @@ workflow {
         [meta, bam, bai]
       }.combine(ref_genome))
 
+      // segmentation + copy-number inference (LOCATE)
+      if (params.run_locate) {
+        LOCATE_CN(BATTENBERG_PHASE.out.vcf.map{ meta, vcf, idx ->
+          [meta.subMap('sampleID','chr'), vcf, idx]
+        })
+      }
+
     } else {
       CLAIR3_N(input_N)
 
@@ -268,6 +276,20 @@ workflow {
         meta = meta + [type:'Tumor-Normal']
         [meta, bed1, idx1, bed2, idx2, ref, idx]
       })
+
+      // segmentation + copy-number + methylation inference (LOCATE)
+      if (params.run_locate) {
+        LOCATE_CN(BATTENBERG_PHASE.out.vcf.map{ meta, vcf, idx ->
+          [meta.subMap('sampleID','chr'), vcf, idx]
+        })
+
+        LOCATE_METHYLATION(
+          METYLATION_HAPLOTYPE_T.out.meth_h1,
+          METYLATION_HAPLOTYPE_T.out.meth_h2,
+          METYLATION_HAPLOTYPE_N.out.meth_h1,
+          METYLATION_HAPLOTYPE_N.out.meth_h2
+        )
+      }
     }
   
 }
