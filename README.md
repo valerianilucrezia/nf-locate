@@ -9,10 +9,11 @@ When `run_locate = true` (default), the pipeline also runs the [LOCATE](https://
 
 # Pipeline overview
 The data pre-processing pipeline is composed by the following steps:
+- `somatic variant calling` (tumor vs normal, via clairS; controlled by `--run_somatic_calling`)
 - `variant calling` (tumor and normal, via clair3 / mpileup)
 - `phasing` (longphase/whatshap on the normal, haplotagging the tumor, haplotagphase on the tumor)
 - `population phasing & haplotype correction` (shapeit4 + battenberg-based BAF segmentation)
-- `methylation` (whatshap split + modkit + dmr)
+- `methylation` (haplotype-specific: whatshap split + modkit + dmr on the corrected haplotag BAM; non-haplotype-specific: modkit + dmr on the unsplit BAMs, controlled by `--run_modkit`)
 - `locate` (segmentation → copy-number inference → methylation inference + ASM, via [LOCATE](https://github.com/valerianilucrezia/locate); controlled by `--run_locate`)
 
 <img width="4300" height="1821" alt="nextflow_pipeline" src="https://github.com/user-attachments/assets/604fc289-e60e-4e57-af64-09a22e3fd0af" />
@@ -71,6 +72,8 @@ s1,s1_tumor.bam,s1_tumor.bam.bai,s1_normal.bam,s1_normal.bam.bai
 | `outdir`             | `null`  | Output directory. _Required_                                                                  |
 | `shortread`          | `true`  | `true`: tumor long-read + normal short-read. `false`: tumor-normal matched long-read.        |
 | `test_chromosomes`   | `null`  | Optional list of chromosomes to restrict the run to (e.g. `[21, 22]`). `null` = all of `1..22`. |
+| `run_somatic_calling`| `false` | Run somatic variant calling (`CLAIRS`, tumor vs normal). Set to `true` to enable. |
+| `run_modkit`         | `false` | Run the non-haplotype-specific methylation block (`modkit` + `dmr` on the unsplit tumor/normal BAMs). Set to `true` to enable. |
 | `publish_dir_mode`   | `copy`  | Nextflow `publishDir` mode used by all processes.                                              |
 
 ### Reference genome

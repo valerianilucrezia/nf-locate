@@ -23,7 +23,7 @@ workflow METYLATION_HAPLOTYPE {
             meta = meta + [hp:'H1_'+meta.type]
             [meta, bam]
         }
-        h1.view()
+        
         h2 = SPLIT_HAPLOTYPE.out.h2_bam.map {meta, bam ->
             meta = meta + [hp:'H2_'+meta.type]
             [meta, bam]

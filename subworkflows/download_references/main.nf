@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
-include { DOWNLOAD_DBSNP; SPLIT_DBSNP_BY_CHR } from "${baseDir}/modules/download_dbsnp/main"
-include { DOWNLOAD_MAP } from "${baseDir}/modules/download_map/main"
-include { DOWNLOAD_1000G } from "${baseDir}/modules/download_1000g/main"
+include { DOWNLOAD_DBSNP; SPLIT_DBSNP_BY_CHR } from "../../modules/download_dbsnp/main"
+include { DOWNLOAD_MAP } from "../../modules/download_map/main"
+include { DOWNLOAD_1000G } from "../../modules/download_1000g/main"
 
 workflow DOWNLOAD_REFERENCES {
 
@@ -15,7 +15,7 @@ workflow DOWNLOAD_REFERENCES {
       // vcf: dbSNP common SNPs, split by chromosome -> [meta(chr), file]
       if (params.vcf) {
         vcf = Channel.fromPath("${params.vcf}/chr*").map { file ->
-            meta = [chr: file.getSimpleName()]
+            def meta = [chr: file.getSimpleName()]
             [meta, file]
         }
       } else {
