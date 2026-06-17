@@ -36,7 +36,7 @@ include { LOCATE_CN; LOCATE_METHYLATION } from "./subworkflows/locate/main"
 
 include { samplesheetToList } from 'plugin/nf-schema'
 
-// run with: nextflow run main.nf -entry SOMATIC --input <CSV> --outdir <DIR>
+// run with: nextflow run main.nf --somatic_only true --input <CSV> --outdir <DIR>
 workflow SOMATIC {
     input = params.input ? Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json")) : Channel.empty()
 
@@ -62,10 +62,13 @@ workflow SOMATIC {
 }
 
 workflow {
+  if (params.somatic_only.toString() == 'true') {
+    SOMATIC()
+  } else {
     // samplesheet validation
     input = params.input ? Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json")) : Channel.empty()
-  
-    input_T = input.map{ meta, bamT, baiT, bamN, baiN -> 
+
+    input_T = input.map{ meta, bamT, baiT, bamN, baiN ->
             meta = meta + [type:'Tumor']
             [meta, bamT, baiT] }
 
@@ -84,7 +87,8 @@ workflow {
     }.join(input_N.map{meta, bam, bai -> 
       [meta.subMap('sampleID'), bam,bai]
     }).combine(ref_genome)
-    if (params.run_somatic_calling == true) {
+
+    if (params.run_somatic_calling.toString() == 'true') {
       CLAIRS(input_vc)
     }
 
@@ -132,7 +136,7 @@ workflow {
     // call var in normal and tumor
     CLAIR3_T(input_T)
 
-    if (params.shortread == true){
+    if (params.shortread.toString() == 'true'){
       MPILEUP(input_N)
       
       tmp_vcf = MPILEUP.out.vcf.map{ meta, v, tbi ->
@@ -196,7 +200,7 @@ workflow {
       // run methylation on tumor using the corrected haplotag bam
       METYLATION_HAPLOTYPE_T(HAPLOTAG_BAM_T_CORRECTED.out.bam.join(HAPLOTAG_BAM_T_CORRECTED.out.list), ref_genome)
 
-      if (params.run_modkit == true) {
+      if (params.run_modkit.toString() == 'true') {
         MODKIT_T(bam_haplotag_corrected.map{meta, bam, bai ->
           meta = meta + [hp:'Tumor']
           [meta, bam, bai]
@@ -204,7 +208,7 @@ workflow {
       }
 
       // segmentation + copy-number inference (LOCATE)
-      if (params.run_locate == true) {
+      if (params.run_locate.toString() == 'true') {
         LOCATE_CN(BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
           [meta.subMap('sampleID','chr'), v, idx]
         })
@@ -278,7 +282,7 @@ workflow {
       METYLATION_HAPLOTYPE_T(HAPLOTAG_BAM_T_CORRECTED.out.bam.join(HAPLOTAG_BAM_T_CORRECTED.out.list), ref_genome)
       METYLATION_HAPLOTYPE_N(HAPLOTAG_BAM_N.out.bam.join(HAPLOTAG_BAM_N.out.list), ref_genome)
 
-      if (params.run_modkit == true) {
+      if (params.run_modkit.toString() == 'true') {
         // modkit tumor and normal
         MODKIT_N(split_N.map{meta, bam, bai ->
           meta = meta + [hp:'Normal']
@@ -311,7 +315,7 @@ workflow {
       }
 
       // segmentation + copy-number + methylation inference (LOCATE)
-      if (params.run_locate == true) {
+      if (params.run_locate.toString() == 'true') {
         LOCATE_CN(BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
           [meta.subMap('sampleID','chr'), v, idx]
         })
@@ -324,6 +328,6 @@ workflow {
         )
       }
     }
-  
+  }
 }
 

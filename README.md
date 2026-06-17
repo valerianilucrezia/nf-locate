@@ -58,13 +58,13 @@ nextflow run main.nf \
 ```
 
 ## Running only somatic variant calling
-To run just the `CLAIRS` somatic variant calling step (tumor vs normal) without the rest of the pipeline, use the `SOMATIC` entry workflow:
+To run just the `CLAIRS` somatic variant calling step (tumor vs normal) without the rest of the pipeline, set `--somatic_only true`:
 ```bash
 nextflow run main.nf \
- -entry SOMATIC \
  -profile <PROFILE> \
  --input <INPUT CSV> \
- --outdir <OUTPUT DIR>
+ --outdir <OUTPUT DIR> \
+ --somatic_only true
 ```
 
 ## Samplesheet
@@ -85,6 +85,8 @@ s1,s1_tumor.bam,s1_tumor.bam.bai,s1_normal.bam,s1_normal.bam.bai
 
 ## Parameters
 
+> **Note:** boolean parameters (`shortread`, `run_locate`, `run_segmentation`, `run_somatic_calling`, `somatic_only`, `run_modkit`) must be passed as the lowercase literals `true` or `false` (e.g. `--run_locate false`), not `1`/`0` or `True`/`False`.
+
 ### General
 | Parameter           | Default | Description                                                                                  |
 | ------------------- | ------- | --------------------------------------------------------------------------------------------- |
@@ -92,7 +94,8 @@ s1,s1_tumor.bam,s1_tumor.bam.bai,s1_normal.bam,s1_normal.bam.bai
 | `outdir`             | `null`  | Output directory. _Required_                                                                  |
 | `shortread`          | `true`  | `true`: tumor long-read + normal short-read. `false`: tumor-normal matched long-read.        |
 | `test_chromosomes`   | `null`  | Optional list of chromosomes to restrict the run to (e.g. `[21, 22]`). `null` = all of `1..22`. |
-| `run_somatic_calling`| `false` | Run somatic variant calling (`CLAIRS`, tumor vs normal). Set to `true` to enable. |
+| `run_somatic_calling`| `false` | Run somatic variant calling (`CLAIRS`, tumor vs normal) as part of the full pipeline. Set to `true` to enable. |
+| `somatic_only`       | `false` | Run only somatic variant calling (`CLAIRS`) and skip the rest of the pipeline. |
 | `run_modkit`         | `false` | Run the non-haplotype-specific methylation block (`modkit` + `dmr` on the unsplit tumor/normal BAMs). Set to `true` to enable. |
 | `publish_dir_mode`   | `copy`  | Nextflow `publishDir` mode used by all processes.                                              |
 

@@ -17,7 +17,7 @@ workflow LOCATE_CN {
 
         table = PREPARE_TABLE_VCF(battenberg_vcf).table
 
-        if (params.run_segmentation) {
+        if (params.run_segmentation.toString() == 'true') {
             breakpoints = SEGMENTATION(table).segments
             cn_input = table.join(breakpoints)
         } else {
