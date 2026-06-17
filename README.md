@@ -47,6 +47,26 @@ nextflow run main.nf \
  --outdir <OUTPUT DIR>
 ```
 
+## Running somatic variant calling alongside the full pipeline
+Somatic variant calling (`CLAIRS`) is skipped by default. To include it as part of a full pipeline run, set `--run_somatic_calling true`:
+```bash
+nextflow run main.nf \
+ -profile <PROFILE> \
+ --input <INPUT CSV> \
+ --outdir <OUTPUT DIR> \
+ --run_somatic_calling true
+```
+
+## Running only somatic variant calling
+To run just the `CLAIRS` somatic variant calling step (tumor vs normal) without the rest of the pipeline, use the `SOMATIC` entry workflow:
+```bash
+nextflow run main.nf \
+ -entry SOMATIC \
+ -profile <PROFILE> \
+ --input <INPUT CSV> \
+ --outdir <OUTPUT DIR>
+```
+
 ## Samplesheet
 Minimal input csv file (`params.input`), validated against `assets/schema_input.json`:
 

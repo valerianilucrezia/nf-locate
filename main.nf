@@ -36,7 +36,32 @@ include { LOCATE_CN; LOCATE_METHYLATION } from "./subworkflows/locate/main"
 
 include { samplesheetToList } from 'plugin/nf-schema'
 
-workflow {  
+// run with: nextflow run main.nf -entry SOMATIC --input <CSV> --outdir <DIR>
+workflow SOMATIC {
+    input = params.input ? Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json")) : Channel.empty()
+
+    input_T = input.map{ meta, bamT, baiT, bamN, baiN ->
+            meta = meta + [type:'Tumor']
+            [meta, bamT, baiT] }
+
+    input_N = input.map{ meta, bamT, baiT, bamN, baiN ->
+            meta = meta + [type:'Normal']
+            [meta, bamN, baiN] }
+
+    ref_genome_ch = Channel.fromPath(params.ref_genome, checkIfExists: true)
+    ref_fai_ch = Channel.fromPath(params.ref_fai, checkIfExists: true)
+    ref_genome = ref_genome_ch.combine(ref_fai_ch)
+
+    input_vc = input_T.map{meta, bam, bai ->
+      [meta.subMap('sampleID'), bam,bai]
+    }.join(input_N.map{meta, bam, bai ->
+      [meta.subMap('sampleID'), bam,bai]
+    }).combine(ref_genome)
+
+    CLAIRS(input_vc)
+}
+
+workflow {
     // samplesheet validation
     input = params.input ? Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json")) : Channel.empty()
   
