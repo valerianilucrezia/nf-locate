@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process CN_INFERENCE {
-    tag "${meta.sampleID}-${meta.chr}"
+    tag "${meta.sampleID}"
     label "process_high"
     label "error_retry"
     // TODO: container with the `locate` package installed (provides the `locate` CLI)
@@ -12,6 +12,7 @@ process CN_INFERENCE {
 
     output:
       tuple val(meta), path('*_cn.csv'), emit: 'cn'
+      tuple val(meta), path('*_purity_ploidy.csv'), emit: 'purity_ploidy'
 
     script:
     def steps        = params.cn_steps        ?: 2000
@@ -26,7 +27,8 @@ process CN_INFERENCE {
     """
     locate cn \
         --input ${table} \
-        --output ${meta.sampleID}_${meta.chr}_cn.csv \
+        --output ${meta.sampleID}_cn.csv \
+        --output-purity-ploidy ${meta.sampleID}_purity_ploidy.csv \
         --steps ${steps} \
         --lr ${lr} \
         --guide ${guide} \

@@ -31,6 +31,7 @@ include {BCFTOOLS_BGZIP as BCFTOOLS_BGZIP_T } from "./modules/bcftools_bgzip/"
 include { WHATSHAP } from "./modules/whatshap/"
 include { DOWNLOAD_REFERENCES } from "./subworkflows/download_references/main"
 include { BATTENBERG_PHASE } from "./modules/battenberg_phase/main"
+include { BCFTOOLS_CONCAT } from "./modules/bcftools_concat/main"
 include { LOCATE_CN; LOCATE_METHYLATION } from "./subworkflows/locate/main"
 
 
@@ -91,6 +92,33 @@ workflow {
     if (params.run_somatic_calling.toString() == 'true') {
       CLAIRS(input_vc)
     }
+
+    // LOCATE_CN's VAF input -- an empty channel (not just "skipped") when
+    // run_somatic_calling=false, so LOCATE_CN can detect per-sample
+    // presence/absence and skip VAF alignment for samples with no somatic
+    // VCF, rather than every sample being silently dropped by a join
+    // against nothing.
+    somatic_vcf_ch = params.run_somatic_calling.toString() == 'true'
+        ? CLAIRS.out.somatic.map { meta, vcf, tbi -> [meta, vcf] }
+        : Channel.empty()
+
+    // Centromere regions to exclude when CN_EXPAND_SEGMENTS fills in the
+    // genome-wide segment output -- no informative BAF/DR signal there, so
+    // a segment overlapping one is split around it rather than reported as
+    // one contiguous span across the gap. Falls back to the NO_FILE
+    // placeholder (cn-expand-segments treats this as "no centromere data,
+    // don't exclude anything") if not provided.
+    centromere_bed = params.centromere_bed
+        ? file(params.centromere_bed, checkIfExists: true)
+        : file("${projectDir}/assets/NO_FILE")
+
+    // Low-mappability regions (e.g. ENCODE) to exclude SNPs from before
+    // segmentation/CN inference ever see them -- their depth/BAF signal
+    // isn't trustworthy there. Falls back to the NO_FILE placeholder
+    // (prepare-table from-vcf treats this as "no filter") if not provided.
+    low_mappability_bed = params.low_mappability_bed
+        ? file(params.low_mappability_bed, checkIfExists: true)
+        : file("${projectDir}/assets/NO_FILE")
 
     // chr channel
     chromosome = Channel.from(params.test_chromosomes ?: (1..22))
@@ -209,9 +237,30 @@ workflow {
 
       // segmentation + copy-number inference (LOCATE)
       if (params.run_locate.toString() == 'true') {
-        LOCATE_CN(BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
-          [meta.subMap('sampleID','chr'), v, idx]
-        })
+        // Combine all per-chromosome battenberg_phase VCFs into one
+        // whole-genome VCF per sample before LOCATE_CN -- DP_T/DP_N are raw,
+        // un-normalized per-chromosome depths (see battenberg_phase.R), so
+        // the genome-wide normalization downstream needs every chromosome
+        // present at once, not one at a time. groupTuple() preserves
+        // per-chromosome arrival order, not genomic order, but
+        // `bcftools concat --naive` requires inputs already in genome
+        // order -- so sort each sample's grouped (chr, vcf, idx) list by
+        // chr (numeric where possible, e.g. '1'..'22' before 'X'/'Y') here
+        // before handing it to BCFTOOLS_CONCAT.
+        battenberg_by_sample = BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
+          [meta.subMap('sampleID'), meta.chr, v, idx]
+        }.groupTuple().map{ meta, chrs, vcfs, idxs ->
+          def order = (0..<chrs.size()).sort{ a, b ->
+            def ca = chrs[a].isNumber() ? chrs[a].toInteger() : (1000 + chrs[a].hashCode())
+            def cb = chrs[b].isNumber() ? chrs[b].toInteger() : (1000 + chrs[b].hashCode())
+            ca <=> cb
+          }
+          [meta, order.collect{ vcfs[it] }, order.collect{ idxs[it] }]
+        }
+
+        concat_vcf = BCFTOOLS_CONCAT(battenberg_by_sample)
+
+        LOCATE_CN(concat_vcf.vcf, somatic_vcf_ch, centromere_bed, low_mappability_bed)
       }
 
     } else {
@@ -316,9 +365,30 @@ workflow {
 
       // segmentation + copy-number + methylation inference (LOCATE)
       if (params.run_locate.toString() == 'true') {
-        LOCATE_CN(BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
-          [meta.subMap('sampleID','chr'), v, idx]
-        })
+        // Combine all per-chromosome battenberg_phase VCFs into one
+        // whole-genome VCF per sample before LOCATE_CN -- DP_T/DP_N are raw,
+        // un-normalized per-chromosome depths (see battenberg_phase.R), so
+        // the genome-wide normalization downstream needs every chromosome
+        // present at once, not one at a time. groupTuple() preserves
+        // per-chromosome arrival order, not genomic order, but
+        // `bcftools concat --naive` requires inputs already in genome
+        // order -- so sort each sample's grouped (chr, vcf, idx) list by
+        // chr (numeric where possible, e.g. '1'..'22' before 'X'/'Y') here
+        // before handing it to BCFTOOLS_CONCAT.
+        battenberg_by_sample = BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
+          [meta.subMap('sampleID'), meta.chr, v, idx]
+        }.groupTuple().map{ meta, chrs, vcfs, idxs ->
+          def order = (0..<chrs.size()).sort{ a, b ->
+            def ca = chrs[a].isNumber() ? chrs[a].toInteger() : (1000 + chrs[a].hashCode())
+            def cb = chrs[b].isNumber() ? chrs[b].toInteger() : (1000 + chrs[b].hashCode())
+            ca <=> cb
+          }
+          [meta, order.collect{ vcfs[it] }, order.collect{ idxs[it] }]
+        }
+
+        concat_vcf = BCFTOOLS_CONCAT(battenberg_by_sample)
+
+        LOCATE_CN(concat_vcf.vcf, somatic_vcf_ch, centromere_bed, low_mappability_bed)
 
         LOCATE_METHYLATION(
           METYLATION_HAPLOTYPE_T.out.meth_h1,

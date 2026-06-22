@@ -76,12 +76,18 @@ normal_phase <- normal_full %>%
   filter(gt_GT != '1/1', gt_GT != '0/0', gt_GT != '1|1', gt_GT != '0|0') %>%
   select(CHROM, POS, H1_NORMAL = H1, H2_NORMAL = H2)
 
-dp_normal <- mean(normal$gt_DP, na.rm = TRUE)
-dp_tumor  <- mean(tumor$gt_DP, na.rm = TRUE)
-ratio <- dp_normal / dp_tumor
+message('mean DP tumor=', round(mean(tumor$gt_DP, na.rm = TRUE), 2),
+        ' normal=', round(mean(normal$gt_DP, na.rm = TRUE), 2))
 
-message('mean DP tumor=', round(dp_tumor, 2), ' normal=', round(dp_normal, 2), ' ratio=', round(ratio, 4))
-
+# gt_DP_T / gt_DP_N (raw per-position tumor/normal depth, kept un-divided) are
+# passed through as-is rather than combined into a DR ratio here. This script
+# runs once per chromosome (see --chr / BATTENBERG_PHASE's per-chromosome
+# tag), so computing/normalizing a depth ratio at this point would only ever
+# see one chromosome's depths -- a per-chromosome ratio would normalize each
+# chromosome against its own depth, erasing real chromosome-level CN signal
+# (e.g. an arm-level gain would partly cancel against its own normalization
+# factor). DR must be derived downstream from these raw DP_T/DP_N values
+# once all chromosomes are combined for a sample, using the genome-wide mean.
 join <- tumor %>%
   left_join(shapeit, by = c('CHROM', 'POS'), suffix = c('_LP', '_SI')) %>%
   filter(FILTER_LP == 'PASS') %>%
@@ -89,15 +95,13 @@ join <- tumor %>%
   mutate(BAF_H1_SI = ifelse(H1_SI == '1', BAF, 1 - BAF)) %>%
   mutate(BAF_H2_SI = ifelse(H2_SI == '1', BAF, 1 - BAF)) %>%
   filter(QUAL_LP >= opt$qual) %>%
-  left_join(normal, by = c('CHROM', 'POS'), suffix = c('_T', '_N')) %>%
-  mutate(DR = (gt_DP_T / gt_DP_N) * ratio)
+  left_join(normal, by = c('CHROM', 'POS'), suffix = c('_T', '_N'))
 
 seg_input <- join %>%
   filter(gt_DP_T > opt$min_dp_tumor, QUAL_LP > opt$min_dp_tumor) %>%
   filter(!is.na(BAF_H1_SI), !is.na(BAF_H2_SI)) %>%
   distinct(CHROM, POS, .keep_all = TRUE) %>%
-  arrange(CHROM, POS) %>%
-  mutate(logDR = log2(DR))
+  arrange(CHROM, POS)
 
 result <- join %>%
   mutate(SEGMENT_H1 = NA_real_, PHASED_H1 = NA_real_, PHASED_H2 = NA_real_)
@@ -177,7 +181,8 @@ ann <- result %>%
     CHROM, POS,
     BAF_H1 = PHASED_H1,
     BAF_H2 = PHASED_H2,
-    DR = DR,
+    DP_T = gt_DP_T,
+    DP_N = gt_DP_N,
     SEGMENT_H1 = SEGMENT_H1,
     SWAP = !is.na(SEGMENT_H1) & SEGMENT_H1 < 0.5
   )
@@ -196,10 +201,11 @@ fmt_num <- function(x, digits = 4) {
 
 baf_h1 <- fmt_num(ann$BAF_H1[idx])
 baf_h2 <- fmt_num(ann$BAF_H2[idx])
-dr     <- fmt_num(ann$DR[idx])
+dp_t   <- fmt_num(ann$DP_T[idx], digits = 0)
+dp_n   <- fmt_num(ann$DP_N[idx], digits = 0)
 seg_h1 <- fmt_num(ann$SEGMENT_H1[idx])
 
-new_info <- paste0('BAF_H1=', baf_h1, ';BAF_H2=', baf_h2, ';DR=', dr, ';SEGMENT_H1=', seg_h1)
+new_info <- paste0('BAF_H1=', baf_h1, ';BAF_H2=', baf_h2, ';DP_T=', dp_t, ';DP_N=', dp_n, ';SEGMENT_H1=', seg_h1)
 existing_info <- fix_df$INFO
 existing_info[is.na(existing_info) | existing_info == '.'] <- ''
 sep <- ifelse(existing_info == '', '', ';')
@@ -210,7 +216,8 @@ vcf_in@meta <- c(
   vcf_in@meta,
   '##INFO=<ID=BAF_H1,Number=1,Type=Float,Description="Battenberg-corrected B-allele frequency for haplotype 1">',
   '##INFO=<ID=BAF_H2,Number=1,Type=Float,Description="Battenberg-corrected B-allele frequency for haplotype 2">',
-  '##INFO=<ID=DR,Number=1,Type=Float,Description="Tumor/normal depth ratio (normalized)">',
+  '##INFO=<ID=DP_T,Number=1,Type=Integer,Description="Raw tumor read depth at this position (un-normalized; combine with DP_N downstream across all chromosomes for a genome-wide-normalized depth ratio)">',
+  '##INFO=<ID=DP_N,Number=1,Type=Integer,Description="Raw normal read depth at this position (un-normalized; combine with DP_T downstream across all chromosomes for a genome-wide-normalized depth ratio)">',
   '##INFO=<ID=SEGMENT_H1,Number=1,Type=Float,Description="PCF segment value for haplotype 1 BAF">'
 )
 

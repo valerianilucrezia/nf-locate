@@ -127,7 +127,8 @@ These parameters control the integrated [LOCATE](https://github.com/valerianiluc
 | `run_locate` | `true` | Run the LOCATE subworkflow (segmentation + CN inference + methylation inference + ASM). Set to `false` to skip. |
 | `run_segmentation` | `true` | Run multivariate ClaSP segmentation before CN inference and pass breakpoints as a prior. Set to `false` to run CN inference without a segmentation prior. |
 | `locate_baf_field` | `BAF_H1` | INFO field extracted from the Battenberg VCF as the BAF signal. |
-| `locate_dr_field` | `DR` | INFO field extracted from the Battenberg VCF as the depth ratio signal. |
+| `locate_dp_tumor_field` | `DP_T` | INFO field extracted from the Battenberg VCF as the raw tumor depth. |
+| `locate_dp_normal_field` | `DP_N` | INFO field extracted from the Battenberg VCF as the raw normal depth. |
 | `segmentation_mode` | `max` | ClaSP score combination mode (`max`, `sum`, `mult`). |
 | `segmentation_frequencies` | `vaf,baf,dr` | Comma-separated signal columns used for segmentation. |
 | `segmentation_window_size` | `suss` | ClaSP window size method (`suss`, `fft`, `acf`) or an integer. |
@@ -166,11 +167,11 @@ All outputs are written under `${outdir}`, organized per-process (see
 | `longphase/`                        | Phased normal VCF (long-read branch) from `longphase modcall`/`phase`.                       |
 | `haplotag/` / `haplotagphase/`      | Tumor BAM haplotagged with the normal phase, and the read-based phased tumor VCF.            |
 | `shapeit4/`                         | Population-phased tumor VCF (SHAPEIT4), plus its index.                                       |
-| `battenberg_phase/`                 | Tumor VCF annotated with `BAF_H1`, `BAF_H2`, `DR`, `SEGMENT_H1` INFO fields, and with `GT` corrected (haplotype-swapped) where Battenberg's PCF segmentation indicates a phase switch. This corrected VCF is also realigned so that H1 matches the normal sample's H1 frame where possible. |
+| `battenberg_phase/`                 | Tumor VCF annotated with `BAF_H1`, `BAF_H2`, `DP_T`, `DP_N`, `SEGMENT_H1` INFO fields, and with `GT` corrected (haplotype-swapped) where Battenberg's PCF segmentation indicates a phase switch. This corrected VCF is also realigned so that H1 matches the normal sample's H1 frame where possible. `DP_T`/`DP_N` are raw, un-normalized per-position depths -- a genome-wide-normalized depth ratio must be derived downstream once all chromosomes for a sample are combined. |
 | `haplotag_corrected/`               | Tumor BAM re-haplotagged using the `battenberg_phase` corrected VCF — this is the BAM used for haplotype-split methylation extraction. |
 | `modkit/` / `methylation_haplotype/`| Per-haplotype methylation calls (modkit pileup) and DMR results, computed on the corrected haplotype split. |
 | `pipeline_info/`                    | Nextflow execution report, timeline, trace and DAG.                                           |
-| `locate/{sampleID}/tables/`         | Per-chromosome BAF/DR tables (from Battenberg VCF) and haplotype methylation tables (from modkit bedMethyl). Produced only when `run_locate = true`. |
+| `locate/{sampleID}/tables/`         | Per-chromosome BAF/DP_T/DP_N tables (from Battenberg VCF) and haplotype methylation tables (from modkit bedMethyl). Produced only when `run_locate = true`. |
 | `locate/{sampleID}/segmentation/`   | Per-chromosome change-point CSVs from multivariate ClaSP. Produced only when `run_locate = true` and `run_segmentation = true`. |
 | `locate/{sampleID}/cn/`             | Per-chromosome copy-number inference results (`CN_Major`, `CN_minor`, `states`, `purity`, `ploidy`). Produced only when `run_locate = true`. |
 | `locate/{sampleID}/methylation/`    | Per-chromosome betaT summaries (`betaT_h1/h2_med/lo/hi`) and ASM results (`BF10`, `P_ASM`, `asm_call`). Produced only in the long-read branch when `run_locate = true`. |
