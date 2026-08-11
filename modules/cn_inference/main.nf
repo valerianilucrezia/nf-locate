@@ -13,6 +13,7 @@ process CN_INFERENCE {
     output:
       tuple val(meta), path('*_cn.csv'), emit: 'cn'
       tuple val(meta), path('*_purity_ploidy.csv'), emit: 'purity_ploidy'
+      tuple val(meta), path('*_diagnostics.npz'), emit: 'diagnostics'
 
     script:
     def steps        = params.cn_steps        ?: 2000
@@ -29,6 +30,7 @@ process CN_INFERENCE {
         --input ${table} \
         --output ${meta.sampleID}_cn.csv \
         --output-purity-ploidy ${meta.sampleID}_purity_ploidy.csv \
+        --output-diagnostics ${meta.sampleID}_diagnostics.npz \
         --steps ${steps} \
         --lr ${lr} \
         --guide ${guide} \

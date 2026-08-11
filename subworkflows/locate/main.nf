@@ -11,6 +11,8 @@ include { SEGMENTATION } from '../../modules/segmentation/'
 include { MERGE_BREAKPOINTS } from '../../modules/merge_breakpoints/'
 include { CN_INFERENCE } from '../../modules/cn_inference/'
 include { CN_EXPAND_SEGMENTS } from '../../modules/cn_expand_segments/'
+include { CN_PLOT } from '../../modules/cn_plot/'
+include { CN_DIAGNOSTIC_PLOT } from '../../modules/cn_diagnostic_plot/'
 include { METHYLATION_INFERENCE } from '../../modules/methylation_inference/'
 
 
@@ -120,10 +122,29 @@ workflow LOCATE_CN {
         cn_expand_input = CN_INFERENCE.out.cn.combine(Channel.fromPath(centromere_bed))
         CN_EXPAND_SEGMENTS(cn_expand_input)
 
+        // Diagnostic plots: genome-wide BAF/DR/(VAF)/CN/(confidence) track
+        // plot (CN_PLOT) and the 4-panel SVI inference diagnostic
+        // (CN_DIAGNOSTIC_PLOT) -- both read straight from CN_INFERENCE's own
+        // outputs, joined back to the original whole-genome table and
+        // breakpoints (if segmentation ran) by sampleID.
+        table_by_id = table_with_vaf.map { meta, t -> [meta.subMap('sampleID'), t] }
+        cn_by_id = CN_INFERENCE.out.cn.map { meta, f -> [meta.subMap('sampleID'), meta, f] }
+        pp_by_id = CN_INFERENCE.out.purity_ploidy.map { meta, f -> [meta.subMap('sampleID'), f] }
+        diag_by_id = CN_INFERENCE.out.diagnostics.map { meta, f -> [meta.subMap('sampleID'), f] }
+        bp_by_id = cn_input.map { meta, t, bp -> [meta.subMap('sampleID'), bp] }
+
+        cn_plot_input = cn_by_id.join(table_by_id).join(pp_by_id).join(diag_by_id).join(bp_by_id)
+            .map { key, meta, cn, t, pp, diag, bp -> [meta, t, cn, pp, diag, bp] }
+        CN_PLOT(cn_plot_input)
+
+        CN_DIAGNOSTIC_PLOT(CN_INFERENCE.out.diagnostics)
+
     emit:
         cn = CN_INFERENCE.out.cn
         cn_segments = CN_EXPAND_SEGMENTS.out.segments
         purity_ploidy = CN_INFERENCE.out.purity_ploidy
+        cn_plot = CN_PLOT.out.plot
+        cn_diagnostic_plot = CN_DIAGNOSTIC_PLOT.out.plot
 }
 
 
