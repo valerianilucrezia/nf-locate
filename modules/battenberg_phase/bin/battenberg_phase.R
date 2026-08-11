@@ -88,12 +88,45 @@ message('mean DP tumor=', round(mean(tumor$gt_DP, na.rm = TRUE), 2),
 # (e.g. an arm-level gain would partly cancel against its own normalization
 # factor). DR must be derived downstream from these raw DP_T/DP_N values
 # once all chromosomes are combined for a sample, using the genome-wide mean.
+# Site selection: a position is a usable SNP if the NORMAL is heterozygous
+# there (the correct definition of "this is a real germline SNP site"), NOT
+# if the tumor's own genotype looks heterozygous. Filtering on the tumor's
+# genotype (as this used to do, via gt_GT_LP) is circular with respect to
+# LOH: a true LOH event makes the tumor homozygous at every one of that
+# region's real germline-het sites by definition, so the old filter
+# silently discarded exactly the positions where LOH is happening --
+# turning "there is a real, strong CN signal here" into "there is no data
+# here" instead of letting BAF (computed from the tumor's own read counts
+# below) show the extreme value LOH actually produces. inner_join against
+# normal_phase (already computed above from the NORMAL's genotype) fixes
+# this; BAF itself still comes from the tumor's read counts (via `tumor`'s
+# own BAF column) so LOH is now visible as BAF near 0 or 1, not missing.
 join <- tumor %>%
+  inner_join(normal_phase, by = c('CHROM', 'POS')) %>%
   left_join(shapeit, by = c('CHROM', 'POS'), suffix = c('_LP', '_SI')) %>%
   filter(FILTER_LP == 'PASS') %>%
-  filter(gt_GT_LP != '1/1', gt_GT_LP != '0/0', gt_GT_LP != '1|1', gt_GT_LP != '0|0') %>%
-  mutate(BAF_H1_SI = ifelse(H1_SI == '1', BAF, 1 - BAF)) %>%
-  mutate(BAF_H2_SI = ifelse(H2_SI == '1', BAF, 1 - BAF)) %>%
+  # BAF_H1_SI/BAF_H2_SI must be a complementary pair (sum to 1) for every
+  # downstream step (PHASED_H1/H2's uniform flip, and prepare-table
+  # from-vcf's min(BAF_H1,BAF_H2) fold) to work correctly. The H1_SI/H2_SI-
+  # based flip below is only a valid re-orientation when SHAPEIT4 phased a
+  # true heterozygous call (H1_SI != H2_SI) -- at a SHAPEIT4-homozygous
+  # site (H1_SI == H2_SI, confirmed ~48% of chr1's positions), both
+  # formulas take the SAME ifelse branch, producing BAF_H1_SI == BAF_H2_SI
+  # == raw BAF (sum = 2*BAF, not 1) instead of a complementary pair -- this
+  # non-complementary value then propagates unchanged through every later
+  # step (PHASED_H1/H2 flips both together, preserving whatever sum they
+  # already had), which is why ~95% of chr1's FINAL exported baf values
+  # ended up >0.5 despite the downstream min() fold. At a SHAPEIT4-
+  # homozygous site there is no real haplotype asymmetry for H1_SI/H2_SI to
+  # resolve anyway, so fold BAF directly to the minor-allele convention
+  # there instead (a true, always-complementary pair: min(BAF,1-BAF) and
+  # its complement 1-min(BAF,1-BAF)).
+  mutate(BAF_H1_SI = ifelse(H1_SI == H2_SI,
+                             pmin(BAF, 1 - BAF),
+                             ifelse(H1_SI == '1', BAF, 1 - BAF))) %>%
+  mutate(BAF_H2_SI = ifelse(H1_SI == H2_SI,
+                             pmax(BAF, 1 - BAF),
+                             ifelse(H2_SI == '1', BAF, 1 - BAF))) %>%
   filter(QUAL_LP >= opt$qual) %>%
   left_join(normal, by = c('CHROM', 'POS'), suffix = c('_T', '_N'))
 
@@ -146,7 +179,9 @@ if (nrow(seg_input) >= MIN_SEG_POINTS) {
 concordance <- result %>%
   filter(!is.na(SEGMENT_H1)) %>%
   mutate(CORRECTED_H1 = ifelse(SEGMENT_H1 < 0.5, H2_LP, H1_LP)) %>%
-  inner_join(normal_phase, by = c('CHROM', 'POS')) %>%
+  # H1_NORMAL/H2_NORMAL already came through `join`'s inner_join(normal_phase, ...)
+  # above (that's now the site-selection join, not a separate later step) --
+  # re-joining normal_phase here would create duplicate/suffixed columns.
   filter(!is.na(CORRECTED_H1), !is.na(H1_NORMAL))
 
 global_flip <- FALSE

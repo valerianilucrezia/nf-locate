@@ -6,12 +6,12 @@ include { PREPARE_TABLE_SOMATIC_VCF } from '../../modules/prepare_table_somatic_
 include { ALIGN_VAF as ALIGN_VAF_CHROM } from '../../modules/align_vaf/'
 include { ALIGN_VAF as ALIGN_VAF_GENOME } from '../../modules/align_vaf/'
 include { SPLIT_TABLE_BY_CHROM } from '../../modules/split_table_by_chrom/'
+include { BIN_TABLE } from '../../modules/bin_table/'
 include { SEGMENTATION } from '../../modules/segmentation/'
 include { MERGE_BREAKPOINTS } from '../../modules/merge_breakpoints/'
 include { CN_INFERENCE } from '../../modules/cn_inference/'
 include { CN_EXPAND_SEGMENTS } from '../../modules/cn_expand_segments/'
 include { METHYLATION_INFERENCE } from '../../modules/methylation_inference/'
-include { ASM } from '../../modules/asm/'
 
 
 workflow LOCATE_CN {
@@ -75,7 +75,21 @@ workflow LOCATE_CN {
 
             chrom_tables_with_vaf = ALIGN_VAF_CHROM(chrom_have_vaf).table.mix(chrom_no_vaf)
 
-            segments = SEGMENTATION(chrom_tables_with_vaf).segments
+            // DR's noise has strong, slowly-decaying local autocorrelation
+            // (not iid), so segmentation runs on fixed-size genomic bins
+            // (median baf/dr/vaf) rather than raw per-SNP rows -- reduces
+            // noise substantially for BAF/VAF, modestly for DR, at some
+            // cost to breakpoint positional resolution. Set
+            // segmentation_bin_size=0 to disable and segment the unbinned
+            // table directly (the pre-binning behavior).
+            def do_bin = (params.segmentation_bin_size ?: 30000) as int
+            if (do_bin > 0) {
+                binned_chrom_tables = BIN_TABLE(chrom_tables_with_vaf).table
+                segments = SEGMENTATION(binned_chrom_tables).segments
+            } else {
+                binned_chrom_tables = Channel.empty()
+                segments = SEGMENTATION(chrom_tables_with_vaf).segments
+            }
 
             // Group each sample's per-chromosome segment CSVs back together
             // for MERGE_BREAKPOINTS, alongside the offsets.csv and
@@ -89,7 +103,13 @@ workflow LOCATE_CN {
                 [meta.subMap('sampleID'), seg]
             }.groupTuple()
 
-            breakpoints = MERGE_BREAKPOINTS(offsets_and_tables.join(segments_by_sample)).breakpoints
+            no_file_bp = file("${projectDir}/assets/NO_FILE")
+            binned_by_sample = do_bin > 0
+                ? binned_chrom_tables.map { meta, f -> [meta.subMap('sampleID'), f] }.groupTuple()
+                : offsets_and_tables.map { key, offsets, chrom_files -> [key, [no_file_bp]] }
+
+            merge_input = offsets_and_tables.join(segments_by_sample).join(binned_by_sample)
+            breakpoints = MERGE_BREAKPOINTS(merge_input).breakpoints
             cn_input = table_with_vaf.join(breakpoints)
         } else {
             cn_input = table_with_vaf.map { meta, t -> [meta, t, no_file] }
@@ -113,6 +133,11 @@ workflow LOCATE_METHYLATION {
         meth_h2_tumor   // tuple(meta, bed.gz, tbi) keyed by sampleID, chr, type -- modkit H2 bedMethyl
         meth_h1_normal  // tuple(meta, bed.gz, tbi) keyed by sampleID, chr, type -- modkit H1 bedMethyl
         meth_h2_normal  // tuple(meta, bed.gz, tbi) keyed by sampleID, chr, type -- modkit H2 bedMethyl
+        purity_ploidy   // tuple(meta, csv) keyed by sampleID -- LOCATE_CN's one-row purity/ploidy
+                        // summary; rho is read from its `purity` column at runtime by
+                        // METHYLATION_INFERENCE, replacing the old fixed params.methylation_rho
+                        // (methylation samples are necessarily contaminated by normal tissue, so a
+                        // single pipeline-wide rho can't be right for every sample).
 
     main:
         key = ['sampleID', 'chr']
@@ -129,10 +154,17 @@ workflow LOCATE_METHYLATION {
 
         methylation_table = PREPARE_TABLE_METHYLATION(meth_table_input).table
 
-        METHYLATION_INFERENCE(methylation_table)
-        ASM(methylation_table)
+        // purity_ploidy is one row per sampleID (genome-wide) -- fan it out
+        // to every chromosome of that sample via combine(by: sampleID).
+        table_by_sample = methylation_table.map { meta, t -> [meta.subMap('sampleID'), meta, t] }
+        purity_by_sample = purity_ploidy.map { meta, pp -> [meta.subMap('sampleID'), pp] }
+
+        table_with_purity = table_by_sample.combine(purity_by_sample, by: 0)
+            .map { key_, meta, t, pp -> [meta, t, pp] }
+
+        METHYLATION_INFERENCE(table_with_purity)
 
     emit:
         betat = METHYLATION_INFERENCE.out.betat
-        asm   = ASM.out.asm
+        asm   = METHYLATION_INFERENCE.out.asm
 }

@@ -141,13 +141,36 @@ These parameters control the integrated [LOCATE](https://github.com/valerianiluc
 | `cn_bp_strength` | `3.0` | Strength of the breakpoint prior on HMM transition logits. |
 | `cn_min_seg_len` | `1` | Minimum consecutive positions for a CN state run (post-processing). |
 | `methylation_model` | `binomial` | Likelihood for betaT inference: `binomial` or `betabinom`. |
-| `methylation_rho` | `0.6` | Tumour contamination fraction for methylation inference. |
 | `methylation_lr` | `1e-2` | Adam learning rate for methylation SVI. |
 | `methylation_steps` | `6000` | SVI iterations for methylation inference. |
 | `asm_a` | `1.0` | Beta prior shape $a$ for ASM analysis. |
 | `asm_b` | `1.0` | Beta prior shape $b$ for ASM analysis. |
 | `asm_pi` | `0.5` | Prior probability of ASM ($H_1$). |
-| `asm_alpha` | `0.05` | Credible interval level for ASM. |
+| `asm_n_draws` | `200` | Latent tumour-only count realizations drawn per site for the ASM Bayes-factor confidence interval. |
+
+> **LOCATE steps run at the granularity their statistics require, not
+> uniformly per chromosome.** `PREPARE_TABLE_VCF` and segmentation still run
+> per chromosome (parallelized across the pipeline as before), but depth-
+> ratio normalization and copy-number inference operate genome-wide: BAF/DR
+> tables from all chromosomes for a sample are concatenated and DR is
+> renormalized once across the whole genome before `CN_INFERENCE` runs, and
+> `MERGE_BREAKPOINTS` combines every chromosome's segmentation output (with
+> a forced breakpoint at each chromosome's start) into one genome-wide
+> breakpoint prior. This matters because DR is a ratio normalized by its own
+> mean — normalizing it one chromosome at a time silently erases real
+> whole-chromosome gains/losses, and CN segments must never span two
+> physically unrelated chromosomes. These fixes live in the shared `locate`
+> library (`prepare-table renormalize-dr`, `prepare-table
+> merge-breakpoints`'s chromosome-boundary forcing, and a corrected
+> multivariate ClaSP recursion that no longer misses transitions on
+> "sandwich" BAF/DR patterns) — this pipeline picks them up automatically
+> once its container/environment is rebuilt against a `locate` version that
+> includes them, no workflow changes required. Haplotype methylation tables
+> (`PREPARE_TABLE_METHYLATION`) can additionally be built with tumour/normal
+> H1-H2 orientation correction (`locate prepare-table from-bed
+> --tumor-vcf/--normal-vcf`); wiring the required phased VCF inputs through
+> this subworkflow is planned but not yet done, so methylation tables
+> currently do not benefit from this correction.
 
 ### Long-read basecalling
 | Parameter     | Default                  | Description                                  |
@@ -171,7 +194,7 @@ All outputs are written under `${outdir}`, organized per-process (see
 | `haplotag_corrected/`               | Tumor BAM re-haplotagged using the `battenberg_phase` corrected VCF — this is the BAM used for haplotype-split methylation extraction. |
 | `modkit/` / `methylation_haplotype/`| Per-haplotype methylation calls (modkit pileup) and DMR results, computed on the corrected haplotype split. |
 | `pipeline_info/`                    | Nextflow execution report, timeline, trace and DAG.                                           |
-| `locate/{sampleID}/tables/`         | Per-chromosome BAF/DP_T/DP_N tables (from Battenberg VCF) and haplotype methylation tables (from modkit bedMethyl). Produced only when `run_locate = true`. |
-| `locate/{sampleID}/segmentation/`   | Per-chromosome change-point CSVs from multivariate ClaSP. Produced only when `run_locate = true` and `run_segmentation = true`. |
-| `locate/{sampleID}/cn/`             | Per-chromosome copy-number inference results (`CN_Major`, `CN_minor`, `states`, `purity`, `ploidy`). Produced only when `run_locate = true`. |
-| `locate/{sampleID}/methylation/`    | Per-chromosome betaT summaries (`betaT_h1/h2_med/lo/hi`) and ASM results (`BF10`, `P_ASM`, `asm_call`). Produced only in the long-read branch when `run_locate = true`. |
+| `locate/{sampleID}/tables/`         | Per-chromosome BAF/DP_T/DP_N tables (from Battenberg VCF, unnormalized DR) plus a genome-wide-concatenated, DR-renormalized table for the sample, and haplotype methylation tables (from modkit bedMethyl). Produced only when `run_locate = true`. |
+| `locate/{sampleID}/segmentation/`   | Per-chromosome change-point CSVs from multivariate ClaSP, plus a merged genome-wide breakpoint CSV (with a forced breakpoint at every chromosome start). Produced only when `run_locate = true` and `run_segmentation = true`. |
+| `locate/{sampleID}/cn/`             | Genome-wide copy-number inference results (`CN_Major`, `CN_minor`, `states`, `purity`, `ploidy`) plus a one-row `*_purity_ploidy.csv` summary. Produced only when `run_locate = true`. |
+| `locate/{sampleID}/methylation/`    | Per-chromosome betaT summaries (`betaT_h1/h2_med/lo/hi`) and ASM results on the inferred tumour-only counts (`BF10_med/lo/hi`, `P_ASM_med/lo/hi`, `asm_call`). Tumour purity (`rho`) is read per sample from `locate/{sampleID}/cn/`'s purity estimate, not a fixed pipeline-wide value, since methylation samples are necessarily contaminated by normal tissue at differing rates. Produced only in the long-read branch when `run_locate = true`. |

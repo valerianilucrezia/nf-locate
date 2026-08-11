@@ -394,7 +394,8 @@ workflow {
           METYLATION_HAPLOTYPE_T.out.meth_h1,
           METYLATION_HAPLOTYPE_T.out.meth_h2,
           METYLATION_HAPLOTYPE_N.out.meth_h1,
-          METYLATION_HAPLOTYPE_N.out.meth_h2
+          METYLATION_HAPLOTYPE_N.out.meth_h2,
+          LOCATE_CN.out.purity_ploidy
         )
       }
     }
