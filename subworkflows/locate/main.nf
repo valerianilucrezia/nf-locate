@@ -14,6 +14,8 @@ include { CN_EXPAND_SEGMENTS } from '../../modules/cn_expand_segments/'
 include { CN_PLOT } from '../../modules/cn_plot/'
 include { CN_DIAGNOSTIC_PLOT } from '../../modules/cn_diagnostic_plot/'
 include { METHYLATION_INFERENCE } from '../../modules/methylation_inference/'
+include { CLASSIFY_POSTERIOR } from '../../modules/classify_posterior/'
+include { AGGREGATE_PROMOTERS } from '../../modules/aggregate_promoters/'
 
 
 workflow LOCATE_CN {
@@ -159,6 +161,17 @@ workflow LOCATE_METHYLATION {
                         // METHYLATION_INFERENCE, replacing the old fixed params.methylation_rho
                         // (methylation samples are necessarily contaminated by normal tissue, so a
                         // single pipeline-wide rho can't be right for every sample).
+        cn_segments     // tuple(meta, csv) keyed by sampleID -- LOCATE_CN.out.cn_segments
+                        // (chrom/start/end/CN_Major/CN_minor, whole-genome). Enables
+                        // AGGREGATE_PROMOTERS' LOH/CNLOH deleted-haplotype resolution; the
+                        // NO_FILE placeholder disables it (promoters are still reported, just
+                        // without the deleted-haplotype-aware masking).
+        reftss_promoters // path -- refTSS promoter reference CSV (export_reftss_promoters.R's
+                        // output: gene/chrom/strand/tss/prom_start/prom_end, every alternative
+                        // promoter kept, not just MANE canonical), or NO_FILE to skip the
+                        // classify-posterior/aggregate-promoters taxonomy entirely.
+        imprinted_genes // path -- gene-list CSV/TXT (see `locate methylation
+                        // build-imprinted-genes`), or NO_FILE to skip imprinted-gene exclusion.
 
     main:
         key = ['sampleID', 'chr']
@@ -185,7 +198,40 @@ workflow LOCATE_METHYLATION {
 
         METHYLATION_INFERENCE(table_with_purity)
 
+        // classify-posterior/aggregate-promoters is additive alongside
+        // infer-asm/analyze-asm above, not a replacement -- see
+        // add_classify_posterior_arguments' own CLI help text. Gated on
+        // run_methylation_taxonomy since it needs a refTSS promoter
+        // reference the pipeline has no vendored default for.
+        run_taxonomy = params.run_methylation_taxonomy.toString() == 'true'
+        if (run_taxonomy) {
+            CLASSIFY_POSTERIOR(table_with_purity)
+
+            cn_by_sample = cn_segments.map { meta, f -> [meta.subMap('sampleID'), f] }
+            classified_by_sample = CLASSIFY_POSTERIOR.out.classified.map { meta, f -> [meta.subMap('sampleID'), meta, f] }
+
+            agg_input = classified_by_sample.combine(cn_by_sample, by: 0)
+                .map { key_, meta, f, cn -> [meta, f, cn] }
+                .combine(Channel.fromPath(reftss_promoters))
+                .combine(Channel.fromPath(imprinted_genes))
+
+            AGGREGATE_PROMOTERS(agg_input)
+
+            // one row per sample: concatenate all chromosomes' per-chromosome
+            // promoter tables, matching aggregate_promoters_reftss.py's own
+            // per-sample pd.concat -- keeps the whole-genome file directly
+            // comparable to that reference output.
+            promoters_genome = AGGREGATE_PROMOTERS.out.promoters
+                .map { meta, f -> [meta.subMap('sampleID').sampleID, f] }
+                .collectFile(keepHeader: true, skip: 1, storeDir: "${params.outdir}/locate/methylation/promoters") { sampleID, f ->
+                    ["${sampleID}_promoters_reftss.csv", f]
+                }
+        }
+
     emit:
         betat = METHYLATION_INFERENCE.out.betat
         asm   = METHYLATION_INFERENCE.out.asm
+        classified = run_taxonomy ? CLASSIFY_POSTERIOR.out.classified : Channel.empty()
+        promoters  = run_taxonomy ? AGGREGATE_PROMOTERS.out.promoters : Channel.empty()
+        promoters_genome = run_taxonomy ? promoters_genome : Channel.empty()
 }

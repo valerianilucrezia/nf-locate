@@ -120,6 +120,29 @@ workflow {
         ? file(params.low_mappability_bed, checkIfExists: true)
         : file("${projectDir}/assets/NO_FILE")
 
+    // refTSS promoter reference for the classify-posterior/aggregate-promoters
+    // methylation taxonomy (params.run_methylation_taxonomy) -- every alternative
+    // promoter/TSS a gene has, not just its MANE canonical one. No vendored
+    // default (it's a per-genome-build reference); required (checkIfExists fails
+    // loudly on a null/missing path, same as ref_genome/ref_fai above) only when
+    // BOTH run_locate and run_methylation_taxonomy are enabled -- this block is
+    // evaluated unconditionally (same as centromere_bed/low_mappability_bed
+    // above), so without the run_locate guard this would demand a promoter
+    // reference even for runs that never call LOCATE_CN/LOCATE_METHYLATION at
+    // all (confirmed: this broke the plain `--shortread false` test run, which
+    // doesn't pass --run_locate).
+    run_taxonomy_requested = params.run_locate.toString() == 'true' && params.run_methylation_taxonomy.toString() == 'true'
+    reftss_promoters = run_taxonomy_requested
+        ? file(params.reftss_promoters, checkIfExists: true)
+        : file("${projectDir}/assets/NO_FILE")
+
+    // optional gene-list CSV/TXT (see `locate methylation build-imprinted-genes`)
+    // -- promoters for these genes are dropped from the aggregated output;
+    // NO_FILE disables the exclusion (output unfiltered).
+    imprinted_genes = params.imprinted_genes
+        ? file(params.imprinted_genes, checkIfExists: true)
+        : file("${projectDir}/assets/NO_FILE")
+
     // chr channel
     chromosome = Channel.from(params.test_chromosomes ?: (1..22))
     chromosome = chromosome.map{ chr ->
@@ -395,7 +418,10 @@ workflow {
           METYLATION_HAPLOTYPE_T.out.meth_h2,
           METYLATION_HAPLOTYPE_N.out.meth_h1,
           METYLATION_HAPLOTYPE_N.out.meth_h2,
-          LOCATE_CN.out.purity_ploidy
+          LOCATE_CN.out.purity_ploidy,
+          LOCATE_CN.out.cn_segments,
+          reftss_promoters,
+          imprinted_genes
         )
       }
     }
