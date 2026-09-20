@@ -9,7 +9,7 @@ process SEGMENTATION {
     tag "${meta.sampleID}-${meta.chr}"
     label "process_medium"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1'
+    container 'docker://lvaleriani/locate:v1.1'
 
     input:
       tuple val(meta), path(table)

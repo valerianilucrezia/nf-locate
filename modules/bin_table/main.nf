@@ -13,10 +13,14 @@ process BIN_TABLE {
     tag "${meta.sampleID}-${meta.chr}"
     label "process_low"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1'
+    container 'docker://lvaleriani/locate:v1.1'
 
     input:
-      tuple val(meta), path(table)
+      // staged in a subfolder: the input and the output are both <chr>_table.csv, and
+      // Nextflow stages inputs as symlinks, so writing the output next to a same-named
+      // input would write THROUGH the symlink and overwrite the upstream task's file
+      // (silently corrupting its cached output).
+      tuple val(meta), path(table, stageAs: 'input/*')
 
     output:
       tuple val(meta), path("${meta.chr}_table.csv"), emit: 'table'

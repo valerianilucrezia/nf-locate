@@ -64,7 +64,11 @@ workflow LOCATE_CN {
             split = SPLIT_TABLE_BY_CHROM(table).chrom_tables
 
             chrom_tables = split.flatMap { meta, chrom_files, offsets ->
-                chrom_files.collect { f ->
+                // a glob matching a single file (e.g. a one-chromosome test) is emitted as a
+                // lone Path, not a list -- and a Path is iterable over its name elements
+                // (orfeo, cephfs, ...), so normalise to a list before collecting.
+                def files = (chrom_files instanceof java.nio.file.Path) ? [chrom_files] : chrom_files
+                files.collect { f ->
                     def chrom = f.name.replaceAll(/_table\.csv$/, '')
                     [meta + [chr: chrom], f]
                 }
