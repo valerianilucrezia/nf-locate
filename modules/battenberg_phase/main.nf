@@ -4,9 +4,8 @@ process BATTENBERG_PHASE {
     tag "${meta.sampleID}-${meta.chr}"
     label "process_medium"
     //label "error_retry"
-    // TODO: build and push the image from modules/battenberg_phase/Dockerfile,
-    // then replace this placeholder with the resulting registry path.
     container 'docker://lvaleriani/battenberg-phase:1.0.1'
+
 
     input:
       tuple val(meta), path(tumor_vcf), path(shapeit_vcf), path(shapeit_csi), path(normal_vcf)

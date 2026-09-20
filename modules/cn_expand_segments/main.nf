@@ -4,8 +4,7 @@ process CN_EXPAND_SEGMENTS {
     tag "${meta.sampleID}"
     label "process_low"
     label "error_retry"
-    // TODO: container with the `locate` package installed (provides the `locate` CLI)
-    container 'TODO/locate:1.0.0'
+    container 'docker://lvaleriani/locate:v1'
 
     input:
       tuple val(meta), path(cn_table), path(centromere_bed)

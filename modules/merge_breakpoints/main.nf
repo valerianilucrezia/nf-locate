@@ -4,8 +4,7 @@ process MERGE_BREAKPOINTS {
     tag "${meta.sampleID}"
     label "process_low"
     label "error_retry"
-    // TODO: container with the `locate` package installed (provides the `locate` CLI)
-    container 'TODO/locate:1.0.0'
+    container 'docker://lvaleriani/locate:v1'
 
     input:
       // binned_chrom_tables is optional (pass an empty list / NO_FILE when

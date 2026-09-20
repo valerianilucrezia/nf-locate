@@ -172,6 +172,11 @@ workflow LOCATE_METHYLATION {
                         // classify-posterior/aggregate-promoters taxonomy entirely.
         imprinted_genes // path -- gene-list CSV/TXT (see `locate methylation
                         // build-imprinted-genes`), or NO_FILE to skip imprinted-gene exclusion.
+        tumor_phased_vcf  // tuple(meta, vcf, tbi) keyed by sampleID, chr -- BATTENBERG_PHASE.out.vcf
+                        // (tumor phasing, phase-block field SEGMENT_H1). With normal_phased_vcf, used to
+                        // reorient the normal's H1/H2 against the tumor's before the tumor/normal comparison.
+        normal_phased_vcf // tuple(meta, vcf) keyed by sampleID, chr -- LONGPHASE.out.vcf (normal phasing,
+                        // phase-block field PS).
 
     main:
         key = ['sampleID', 'chr']
@@ -185,6 +190,20 @@ workflow LOCATE_METHYLATION {
         }).join(meth_h2_normal.map { meta, bed, tbi ->
             [meta.subMap(key), bed, tbi]
         })
+
+        // Tumor/normal H1/H2 orientation: phasing labels H1/H2 arbitrarily per phase
+        // block, independently per sample, so tumor and normal H1 only agree by
+        // chance. Joining both phased VCFs lets `prepare-table from-bed` reorient the
+        // normal per block and mark `orientation_resolved`; without it TSM/NSM would
+        // silently compare mismatched haplotypes about half the time.
+        if (params.methylation_reorient.toString() == 'true') {
+            meth_table_input = meth_table_input
+                .join(tumor_phased_vcf.map { meta, v, tbi -> [meta.subMap(key), v] })
+                .join(normal_phased_vcf.map { meta, v -> [meta.subMap(key), v] })
+        } else {
+            no_file_vcf = file("${projectDir}/assets/NO_FILE")
+            meth_table_input = meth_table_input.map { k, a, b, c, d, e, f, g, h -> [k, a, b, c, d, e, f, g, h, no_file_vcf, no_file_vcf] }
+        }
 
         methylation_table = PREPARE_TABLE_METHYLATION(meth_table_input).table
 

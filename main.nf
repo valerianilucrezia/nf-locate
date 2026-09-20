@@ -273,7 +273,7 @@ workflow {
         battenberg_by_sample = BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
           [meta.subMap('sampleID'), meta.chr, v, idx]
         }.groupTuple().map{ meta, chrs, vcfs, idxs ->
-          def order = (0..<chrs.size()).sort{ a, b ->
+          def order = (0..<chrs.size()).toList().sort(false){ a, b ->
             def ca = chrs[a].isNumber() ? chrs[a].toInteger() : (1000 + chrs[a].hashCode())
             def cb = chrs[b].isNumber() ? chrs[b].toInteger() : (1000 + chrs[b].hashCode())
             ca <=> cb
@@ -401,7 +401,7 @@ workflow {
         battenberg_by_sample = BATTENBERG_PHASE.out.vcf.map{ meta, v, idx ->
           [meta.subMap('sampleID'), meta.chr, v, idx]
         }.groupTuple().map{ meta, chrs, vcfs, idxs ->
-          def order = (0..<chrs.size()).sort{ a, b ->
+          def order = (0..<chrs.size()).toList().sort(false){ a, b ->
             def ca = chrs[a].isNumber() ? chrs[a].toInteger() : (1000 + chrs[a].hashCode())
             def cb = chrs[b].isNumber() ? chrs[b].toInteger() : (1000 + chrs[b].hashCode())
             ca <=> cb
@@ -421,7 +421,9 @@ workflow {
           LOCATE_CN.out.purity_ploidy,
           LOCATE_CN.out.cn_segments,
           reftss_promoters,
-          imprinted_genes
+          imprinted_genes,
+          BATTENBERG_PHASE.out.vcf,
+          LONGPHASE.out.vcf
         )
       }
     }

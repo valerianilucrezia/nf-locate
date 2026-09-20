@@ -166,11 +166,15 @@ These parameters control the integrated [LOCATE](https://github.com/valerianiluc
 > "sandwich" BAF/DR patterns) — this pipeline picks them up automatically
 > once its container/environment is rebuilt against a `locate` version that
 > includes them, no workflow changes required. Haplotype methylation tables
-> (`PREPARE_TABLE_METHYLATION`) can additionally be built with tumour/normal
-> H1-H2 orientation correction (`locate prepare-table from-bed
-> --tumor-vcf/--normal-vcf`); wiring the required phased VCF inputs through
-> this subworkflow is planned but not yet done, so methylation tables
-> currently do not benefit from this correction.
+> (`PREPARE_TABLE_METHYLATION`) are built with tumour/normal H1-H2 orientation
+> correction (`locate prepare-table from-bed --tumor-vcf/--normal-vcf`): phasing
+> labels H1/H2 arbitrarily per phase block and per sample, so the normal's H1 is
+> only by chance the tumour's H1. The tumour (`BATTENBERG_PHASE`) and normal
+> (`LONGPHASE`) phased VCFs are joined per sample/chromosome and passed through
+> (`--methylation_reorient`, default `true`, long-read branch); the resulting
+> `orientation_resolved` column restricts TSM/NSM to CpGs with a confirmed
+> haplotype correspondence. With `--methylation_reorient false` the tumour/normal
+> comparison is left uncorrected.
 
 ### Long-read basecalling
 | Parameter     | Default                  | Description                                  |

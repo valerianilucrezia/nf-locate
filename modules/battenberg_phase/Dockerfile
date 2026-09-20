@@ -1,4 +1,10 @@
-FROM rocker/tidyverse:4.3.2
+# linux/amd64 pinned explicitly: rocker/tidyverse only publishes an amd64
+# manifest, and this also matches what the cluster actually runs on
+# (Singularity/amd64 nodes) -- without this, building on Apple Silicon
+# defaults to the host's arm64 platform and fails with "no match for
+# platform in manifest". Runs fine on Apple Silicon via Docker Desktop's
+# built-in emulation, just slower than a native build.
+FROM --platform=linux/amd64 rocker/tidyverse:4.3.2
 
 # htslib tools (tabix/bgzip) for indexing the output VCF
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -4,8 +4,7 @@ process PREPARE_TABLE_SOMATIC_VCF {
     tag "${meta.sampleID}"
     label "process_low"
     label "error_retry"
-    // TODO: container with the `locate` package installed (provides the `locate` CLI)
-    container 'TODO/locate:1.0.0'
+    container 'docker://lvaleriani/locate:v1'
 
     input:
       tuple val(meta), path(vcf)
