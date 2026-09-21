@@ -9,7 +9,7 @@ process ALIGN_VAF {
     tag "${meta.chr ? meta.sampleID + '-' + meta.chr : meta.sampleID}"
     label "process_low"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.1'
+    container 'docker://lvaleriani/locate:v1.2'
 
     input:
       tuple val(meta), path(grid_table), path(somatic_table)

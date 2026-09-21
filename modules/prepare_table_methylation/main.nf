@@ -4,7 +4,7 @@ process PREPARE_TABLE_METHYLATION {
     tag "${meta.sampleID}-${meta.chr}"
     label "process_low"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.1'
+    container 'docker://lvaleriani/locate:v1.2'
 
     input:
       tuple val(meta), path(h1_tumor), path(h1_tumor_tbi), path(h2_tumor), path(h2_tumor_tbi), path(h1_normal), path(h1_normal_tbi), path(h2_normal), path(h2_normal_tbi), path(tumor_phased_vcf), path(normal_phased_vcf)

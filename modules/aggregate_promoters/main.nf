@@ -4,7 +4,7 @@ process AGGREGATE_PROMOTERS {
     tag "${meta.sampleID}-${meta.chr}"
     label "process_medium"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.1'
+    container 'docker://lvaleriani/locate:v1.2'
 
     input:
       tuple val(meta), path(classified), path(cn_segments), path(reftss_promoters), path(imprinted_genes)
