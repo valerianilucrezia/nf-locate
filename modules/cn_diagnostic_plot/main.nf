@@ -4,7 +4,7 @@ process CN_DIAGNOSTIC_PLOT {
     tag "${meta.sampleID}"
     label "process_low"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.2'
+    container 'docker://lvaleriani/locate:v1.3'
 
     input:
       tuple val(meta), path(diagnostics)

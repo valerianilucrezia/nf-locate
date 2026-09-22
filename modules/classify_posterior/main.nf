@@ -4,7 +4,7 @@ process CLASSIFY_POSTERIOR {
     tag "${meta.sampleID}-${meta.chr}"
     label "process_high"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.2'
+    container 'docker://lvaleriani/locate:v1.3'
 
     input:
       tuple val(meta), path(table), path(purity_ploidy)

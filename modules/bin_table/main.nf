@@ -13,7 +13,7 @@ process BIN_TABLE {
     tag "${meta.sampleID}-${meta.chr}"
     label "process_low"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.2'
+    container 'docker://lvaleriani/locate:v1.3'
 
     input:
       // staged in a subfolder: the input and the output are both <chr>_table.csv, and

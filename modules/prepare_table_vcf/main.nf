@@ -4,7 +4,7 @@ process PREPARE_TABLE_VCF {
     tag "${meta.sampleID}"
     label "process_low"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.2'
+    container 'docker://lvaleriani/locate:v1.3'
 
     input:
       // vcf is now the whole-genome VCF for this sample (all chromosomes

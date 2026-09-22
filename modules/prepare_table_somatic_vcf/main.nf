@@ -4,7 +4,7 @@ process PREPARE_TABLE_SOMATIC_VCF {
     tag "${meta.sampleID}"
     label "process_low"
     label "error_retry"
-    container 'docker://lvaleriani/locate:v1.2'
+    container 'docker://lvaleriani/locate:v1.3'
 
     input:
       tuple val(meta), path(vcf)
