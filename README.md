@@ -176,6 +176,27 @@ These parameters control the integrated [LOCATE](https://github.com/valerianiluc
 > haplotype correspondence. With `--methylation_reorient false` the tumour/normal
 > comparison is left uncorrected.
 
+## Compute resources
+Per-process defaults live in `config/base.config`, keyed by Nextflow labels
+(`withLabel:`), not hardcoded per-process — a process opts in to a label in
+its own module file. Sizes below were set from a real full-size run's
+`execution_trace` (CASTLE sample 1395, all 22 chromosomes), not estimated:
+
+| Label | Memory | Used by | Why |
+| ----- | ------ | ------- | --- |
+| `process_high` | `16.GB * task.attempt` | `CN_INFERENCE`, `CLASSIFY_POSTERIOR`, `samtools_index`, `longphase` | CN inference and the per-CpG taxonomy classifier both peaked around 5GB on a full chromosome-scale sample; 16GB leaves ~3x headroom. |
+| `process_high_mem` | `96.GB * task.attempt` | `METHYLATION_INFERENCE` | The older per-CpG `infer-asm`/BF10 path scales with chromosome size and peaked at 70.6GB on chr1 (68.5GB chr2, 58.4GB chr7) — needs its own, much larger label rather than sharing `process_high`. |
+
+`CN_INFERENCE`'s low footprint depends on a `locate` fix (v1.3+): the SVI
+training loop was always cheap, but the one-shot post-training decode step
+built an unused gradient graph (no `torch.no_grad()`) and the diagnostics
+step drew 1,000 pointless posterior samples even with `cn_guide = "delta"`
+(a point-estimate guide with no real posterior spread) — together these
+made memory climb unboundedly after training finished, regardless of how
+much was allocated (confirmed OOM at 64/128/192/256GB before the fix). On a
+`locate` image older than v1.3, `CN_INFERENCE` needs a much larger
+allocation and can still fail.
+
 ### Long-read basecalling
 | Parameter     | Default                  | Description                                  |
 | -------------- | ------------------------- | ----------------------------------------------- |
